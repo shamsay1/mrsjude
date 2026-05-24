@@ -21,4 +21,8 @@ class Subject extends Model
     {
         return $this->belongsTo(SystemUser::class, 'teacher_id');
     }
+    public function lessonPlans()
+{
+    return $this->hasMany(LessonPlan::class);
+}
 }

@@ -129,8 +129,9 @@ body {
 /* ================= GRID ================= */
 .five-cols {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+    width: 100%;
 }
 
 /* Tablet */
@@ -204,40 +205,109 @@ body {
     $current = Route::currentRouteName();
 @endphp
 
-
-<a href="/dashboard" class="active">
+@if(Auth::user()->role=="admin")
+<a href="/dashboard" class="{{ request()->is('dashboard') ? 'active' : '' }}">
     <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
 </a>
 
-<a href="{{ route('district.index') }}" class="">
-    <i class="bi bi-people-fill"></i> <span>Districts</span>
-</a>
-<a href="{{ route('school.index') }}" class="">
-    <i class="bi bi-people-fill"></i> <span>Schools</span>
-</a>
-<a href="{{ route('system-user.index') }}" class="">
-    <i class="bi bi-people-fill"></i> <span>Manage users</span>
-</a>
-<a href="{{ route('school-class.index') }}" class="">
-    <i class="bi bi-people-fill"></i> <span>Class rooms</span>
-</a>
-<a href="{{ route('subject.index') }}" class="">
-    <i class="bi bi-people-fill"></i> <span>Subject</span>
+<a href="{{ route('district.index') }}" class="{{ request()->routeIs('district.*') ? 'active' : '' }}">
+    <i class="bi bi-geo-alt-fill"></i> <span>Districts</span>
 </a>
 
+<a href="{{ route('school.index') }}" class="{{ request()->routeIs('school.*') ? 'active' : '' }}">
+    <i class="bi bi-building"></i> <span>Schools</span>
+</a>
+
+<a href="{{ route('system-user.index') }}" class="{{ request()->routeIs('system-user.*') ? 'active' : '' }}">
+    <i class="bi bi-person-gear"></i> <span>Manage Users</span>
+</a>
+
+<a href="{{ route('schoold') }}" class="{{ request()->routeIs('schoold') ? 'active' : '' }}">
+    <i class="bi bi-diagram-3-fill"></i> <span>School District</span>
+</a>
+
+<a href="" class="">
+    <i class="bi bi-file-earmark-bar-graph"></i> <span>Report</span>
+</a>
+
+<a href="{{ route('profile') }}" class="{{ request()->routeIs('profile') ? 'active' : '' }}">
+    <i class="bi bi-person-circle"></i> <span>Profile</span>
+</a>
+@elseif(Auth::user()->role =="d_officer")
+<a href="/dashboard" class="{{ request()->is('dashboard') ? 'active' : '' }}">
+    <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
+</a>
+<a href="{{ route('system-user.index') }}" class="{{ request()->routeIs('system-user.*') ? 'active' : '' }}">
+    <i class="bi bi-person-gear"></i> <span>View Teachers</span>
+</a>
+<a href="" class="">
+    <i class="bi bi-file-earmark-bar-graph"></i> <span>Send Report</span>
+</a>
+@elseif(Auth::user()->role =="headmaster")
+
+<a href="/dashboard" class="{{ request()->is('dashboard') ? 'active' : '' }}">
+    <i class="bi bi-speedometer2"></i>
+    <span>Dashboard</span>
+</a>
+
+<a href="{{ route('system-user.index') }}"
+   class="{{ request()->routeIs('system-user.*') ? 'active' : '' }}">
+    <i class="bi bi-person-lines-fill"></i>
+    <span>View Teachers</span>
+</a>
+
+<a href="{{ route('school-class.index') }}"
+   class="{{ request()->routeIs('school-class.*') ? 'active' : '' }}">
+    <i class="bi bi-door-open-fill"></i>
+    <span>Class Rooms</span>
+</a>
+
+<a href="{{ route('subject.index') }}"
+   class="{{ request()->routeIs('subject.*') ? 'active' : '' }}">
+    <i class="bi bi-book-fill"></i>
+    <span>Subjects</span>
+</a>
+
+<a href="{{ route('showtl') }}"
+   class="{{ request()->routeIs('showtl') ? 'active' : '' }}">
+    <i class="bi bi-journal-text"></i>
+    <span>View Lesson Plans</span>
+</a>
 
 
+@elseif(Auth::user()->role =="teacher")
 
+<a href="/dashboard" class="{{ request()->is('dashboard') ? 'active' : '' }}">
+    <i class="bi bi-speedometer2"></i>
+    <span>Dashboard</span>
+</a>
 
+<a href="{{ route('subject.index') }}"
+   class="{{ request()->routeIs('subject.*') ? 'active' : '' }}">
+    <i class="bi bi-book-half"></i>
+    <span>Subjects</span>
+</a>
 
+<a href="{{ route('lesson-plan.index') }}"
+   class="{{ request()->routeIs('lesson-plan.*') ? 'active' : '' }}">
+    <i class="bi bi-journal-check"></i>
+    <span>Lesson Plan</span>
+</a>
 
+<a href="{{ route('daily-record.index') }}"
+   class="{{ request()->routeIs('daily-record.*') ? 'active' : '' }}">
+    <i class="bi bi-clipboard-data-fill"></i>
+    <span>Daily Record</span>
+</a>
 
+@endif
 
-<a href=""
+<a href="{{ route('logout') }}"
    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
    <i class="bi bi-box-arrow-right"></i> <span>Logout</span>
 </a>
-<form id="logout-form" action="" method="POST" style="display: none;">
+
+<form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
     @csrf
 </form>
 

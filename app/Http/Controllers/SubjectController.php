@@ -6,26 +6,30 @@ use App\Models\ClassRoom;
 use App\Models\Subject;
 use App\Models\SystemUser;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SubjectController extends Controller
 {
     public function index()
-    {
-        $subjects = Subject::with([
-            'classRoom',
-            'teacher'
-        ])->latest()->get();
+{
+    $user = Auth::user();
+    $classes = ClassRoom::where('school_id', $user->school_id)->get();
 
-        $classes = ClassRoom::all();
+    $teachers = SystemUser::where('school_id', $user->school_id)
+        ->where('role', 'teacher')
+        ->get();
+   $subjects = Subject::with(['classRoom', 'teacher'])
+    ->whereHas('classRoom', function ($q) use ($user) {
+        $q->where('school_id', $user->school_id);
+    })
+    ->join('class_rooms', 'subjects.class_room_id', '=', 'class_rooms.id')
+    ->orderBy('class_rooms.class_name', 'asc')
+    ->select('subjects.*')
+    ->get()
+    ->groupBy('class_room_id');
 
-        $teachers = SystemUser::all();
-
-        return view('subjects', compact(
-            'subjects',
-            'classes',
-            'teachers'
-        ));
-    }
+    return view('subjects', compact('subjects', 'classes', 'teachers'));
+}
 
     // Store Data
     public function store(Request $request)

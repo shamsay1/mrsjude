@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\District;
 use App\Models\School;
+use App\Models\SystemUser;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SchoolController extends Controller
 {
@@ -68,4 +70,26 @@ class SchoolController extends Controller
         return redirect()->back()
             ->with('success', 'School deleted successfully');
     }
+
+    public function schoold()
+{
+    $districts = District::with('schools')->orderBy('district_name')->get();
+
+    return view('districtSchool', compact('districts'));
+}
+    public function teachers($id)
+{
+    $school = School::findOrFail($id);
+
+    $teachers = SystemUser::where('school_id', $id)->get();
+
+    return view('viewteacher', compact('school', 'teachers'));
+}
+
+ public function showtl(){
+    $school = School::where('id', Auth::user()->school_id)->get();
+    $teachers = SystemUser::where('role','teacher')->where('school_id', Auth::user()->school_id)->get();
+    return view('viewteacher', compact('school', 'teachers'));
+
+ }
 }

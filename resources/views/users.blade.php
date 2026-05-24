@@ -7,13 +7,13 @@
     <div class="table-container">
 
         <!-- Add User Button -->
+        @if (Auth::user()->role == "admin")
         <button class="btn btn-primary mb-3"
             data-bs-toggle="modal"
             data-bs-target="#addUserModal">
-
             + Add User
-
         </button>
+        @endif
 
         <!-- Add Modal -->
         <div class="modal fade" id="addUserModal" tabindex="-1">
@@ -106,6 +106,7 @@
 
                                     <input type="password"
                                         name="password"
+                                        value="12345"
                                         class="form-control">
 
                                 </div>
@@ -124,6 +125,7 @@
 
                                             <option value="d_officer">District Officer</option>
                                             <option value="teacher">Teacher</option>
+                                            <option value="headmaster">Head Master</option>
 
                                     </select>
 
@@ -191,6 +193,117 @@
         </div>
 
         <!-- Table -->
+        @if(Auth::user()->role!="headmaster")
+        <form method="GET" action="{{ route('system-user.index') }}">
+
+    <div class="row mb-3">
+
+        <!-- ROLE -->
+        <div class="col-md-3">
+
+            <label>Filter By Role</label>
+
+            <select name="role" class="form-control">
+
+                <option value="">All Roles</option>
+
+                <option value="teacher"
+                    {{ request('role') == 'teacher' ? 'selected' : '' }}>
+
+                    Teacher
+
+                </option>
+
+                <option value="headmaster"
+                    {{ request('role') == 'headmaster' ? 'selected' : '' }}>
+
+                    Headmaster
+
+                </option>
+                <option value="d_officer"
+                    {{ request('role') == 'd_officer' ? 'selected' : '' }}>
+
+                    Distric Officer
+
+                </option>
+
+            </select>
+
+        </div>
+
+        <!-- DISTRICT -->
+        @if(Auth::user()->role == "admin")
+        <div class="col-md-3">
+
+            <label>Filter By District</label>
+
+            <select name="district_id" class="form-control">
+
+                <option value="">All Districts</option>
+
+                @foreach($districts as $district)
+
+                    <option value="{{ $district->id }}"
+                        {{ request('district_id') == $district->id ? 'selected' : '' }}>
+
+                        {{ $district->district_name }}
+
+                    </option>
+
+                @endforeach
+
+            </select>
+
+        </div>
+        @endif
+
+        <!-- SCHOOL -->
+        <div class="col-md-3">
+
+            <label>Filter By School</label>
+
+            <select name="school_id" class="form-control">
+
+                <option value="">All Schools</option>
+
+                @foreach($schools as $school)
+
+                    <option value="{{ $school->id }}"
+                        {{ request('school_id') == $school->id ? 'selected' : '' }}>
+
+                        {{ $school->school_name }}
+
+                    </option>
+
+                @endforeach
+
+            </select>
+
+        </div>
+        <div class="col-md-3">
+            <br>
+            <button class="btn btn-primary">
+        Filter
+    </button>
+
+    <a href="{{ route('system-user.index') }}"
+        class="btn btn-secondary">
+
+        Reset
+
+    </a>
+        </div>
+
+    </div>
+
+    
+
+</form>
+@endif
+    @if(Auth::user()->role=="headmaster")
+      <h2 style="color: green;font-family: 'Times New Roman', Times, serif">Teachers Information</h2>
+      <hr>
+      @endif
         <table class="table table-sm table-hover">
 
             <thead class="bg-secondary text-white">
@@ -203,6 +316,7 @@
                     <th>Gender</th>
                     <th>District</th>
                     <th>School</th>
+                    <th>Role</th>
                     <th>Action</th>
 
                 </tr>
@@ -230,6 +344,11 @@
                         <td>{{ $user->district->district_name ?? 'N/A' }}</td>
 
                         <td>{{ $user->school->school_name ?? 'N/A' }}</td>
+                        <td>
+                            <span class="badge bg-success">
+                                {{ $user->role }}
+                            </span>
+                        </td>
 
                         <td>
 
@@ -445,7 +564,7 @@
                 @empty
 
                     <tr>
-                        <td colspan="7">No Record Found</td>
+                        <td colspan="7" style="text-align: center">No Record Found</td>
                     </tr>
 
                 @endforelse

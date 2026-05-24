@@ -5,12 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\ClassRoom;
 use App\Models\School;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ClassRoomController extends Controller
 {
      public function index()
     {
         $classes = ClassRoom::with('school')
+            ->orderBy('class_name')
+            ->where('school_id',Auth::user()->school_id)
             ->latest()
             ->get();
 
@@ -28,13 +31,12 @@ class ClassRoomController extends Controller
         $request->validate([
             'class_name' => 'required',
             'class_level' => 'required',
-            'school_id' => 'required'
         ]);
 
         ClassRoom::create([
             'class_name' => $request->class_name,
             'class_level' => $request->class_level,
-            'school_id' => $request->school_id
+            'school_id' => Auth::user()->school_id
         ]);
 
         return redirect()->back()

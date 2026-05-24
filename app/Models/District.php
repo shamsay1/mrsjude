@@ -11,6 +11,6 @@ class District extends Model
     ];
     public function schools()
 {
-    return $this->hasMany(School::class);
+    return $this->hasMany(School::class,'district_id');
 }
 }

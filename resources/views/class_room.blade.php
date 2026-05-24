@@ -65,32 +65,7 @@
 
                             </div>
 
-                            <div class="row">
-
-                                <div class="col-md-12 mb-3">
-
-                                    <label>School</label>
-
-                                    <select name="school_id"
-                                        class="form-control">
-
-                                        <option value="">
-                                            Select School
-                                        </option>
-
-                                        @foreach ($schools as $school)
-
-                                            <option value="{{ $school->id }}">
-                                                {{ $school->school_name }}
-                                            </option>
-
-                                        @endforeach
-
-                                    </select>
-
-                                </div>
-
-                            </div>
+                          
 
                         </div>
 

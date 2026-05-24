@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
+    <title>Hotel Login</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Bootstrap -->
@@ -21,7 +21,6 @@
 
             /* HOTEL STYLE BACKGROUND */
             background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-            /* background: red; */
         }
 
         .login-card {
@@ -83,48 +82,44 @@
 <div class="login-card">
     
     <h4 class="login-title text-center">
-        Teachers Daily Recording <br> Management System
+        Hotel Reservation <br> Management System
     </h4>
-    @if(session('success'))
-    <span style="color: green">{{ $session('sucess') }}</span>
-    @endif
 
     <p class="text-center text-muted mb-3" style="font-size: 14px;">
-        Enter your credentials to login
+        Create New password to login
     </p>
 
-    <form action="{{ route('login1') }}" method="post">
+    <form action="{{ route('password.update') }}" method="post">
        @csrf
-        <!-- Email -->
-        <div class="mb-3 input-group">
-            <span class="input-group-text">
-                <i class="bi bi-envelope"></i>
-            </span>
-            <input type="email" name="email" class="form-control" placeholder="Enter email" required>
-        </div>
 
-        <!-- Password -->
-        <div class="mb-2 input-group">
+     
+      <input type="hidden" name="token" value="{{ $token }}">
+       <input type="hidden" name="email" value="{{ $email }}">
+       <div class="mb-2 input-group">
             <span class="input-group-text">
                 <i class="bi bi-lock"></i>
             </span>
-            <input type="password" name="password" id="password" class="form-control" placeholder="Enter password" required>
+            <input type="password" name="password" id="password" class="form-control" placeholder="Create New password" required>
             <span class="input-group-text toggle-password" onclick="togglePassword()">
                 <i class="bi bi-eye" id="eyeIcon"></i>
             </span>
         </div>
 
-        <!-- Forgot password -->
-        <div class="text-end mb-3">
-            <a href="{{ route('forgot') }}" style="font-size: 13px; text-decoration: none;">
-                Forgot password?
-            </a>
+        <div class="mb-2 input-group">
+            <span class="input-group-text">
+                <i class="bi bi-lock"></i>
+            </span>
+            <input type="password" name="password_confirmation" id="password" class="form-control" placeholder="Confirm password" required>
+            <span class="input-group-text toggle-password" onclick="togglePassword()">
+                <i class="bi bi-eye" id="eyeIcon"></i>
+            </span>
         </div>
-
+        
         <!-- Button -->
         <button type="submit" class="btn btn-login w-100">
-            Login
+            Change password
         </button>
+        
         @if(session("error"))
             <span style="color: red">{{ session("error") }}</span>
         @endif
@@ -132,7 +127,6 @@
     </form>
 
 </div>
-
 <script>
 function togglePassword() {
     let password = document.getElementById("password");
@@ -149,6 +143,7 @@ function togglePassword() {
     }
 }
 </script>
+
 
 </body>
 </html>
