@@ -66,20 +66,18 @@
                 </td>
                 <td>
 
-                    <a href=""
-                       class="btn btn-sm btn-info">
-
-                        View Scheme of work
-
+                    <a href="{{ route('scheme.index1', $teacher->id) }}"
+                    class="btn btn-sm btn-info">
+                        View Scheme of Work
                     </a>
 
                 </td>
                 <td>
 
-                    <a href="{{ route('teacher.daily-records', $teacher->id) }}"
-                       class="btn btn-sm btn-primary">
+                    <a href="{{ route('teacher.assessment.book', $teacher->id) }}"
+                    class="btn btn-sm btn-primary">
 
-                        View assesment book
+                        View Assessment Book
 
                     </a>
 

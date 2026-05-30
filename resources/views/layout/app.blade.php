@@ -255,6 +255,11 @@ body {
     <i class="bi bi-person-lines-fill"></i>
     <span>View Teachers</span>
 </a>
+<a href="{{ route('student.index') }}"
+   class="{{ request()->routeIs('system-user.*') ? 'active' : '' }}">
+    <i class="bi bi-people"></i>
+    <span>Student info</span>
+</a>
 
 <a href="{{ route('school-class.index') }}"
    class="{{ request()->routeIs('school-class.*') ? 'active' : '' }}">
@@ -292,6 +297,17 @@ body {
    class="{{ request()->routeIs('lesson-plan.*') ? 'active' : '' }}">
     <i class="bi bi-journal-check"></i>
     <span>Lesson Plan</span>
+</a>
+
+<a href="{{ route('assessment.index') }}"
+   class="{{ request()->routeIs('assessment.*') ? 'active' : '' }}">
+    <i class="bi bi-journal-check"></i>
+    <span>Assessment Book</span>
+</a>
+<a href="{{ route('scheme.index') }}"
+   class="{{ request()->routeIs('assessment.*') ? 'active' : '' }}">
+    <i class="bi bi-journal-check"></i>
+    <span>Schemes of work</span>
 </a>
 
 <a href="{{ route('daily-record.index') }}"

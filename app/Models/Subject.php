@@ -25,4 +25,14 @@ class Subject extends Model
 {
     return $this->hasMany(LessonPlan::class);
 }
+     public function assessments()
+{
+    return $this->hasMany(Assessment::class);
 }
+
+ public function schemesOfWork()
+    {
+        return $this->hasMany(SchemeOfWork::class);
+    }
+}
+

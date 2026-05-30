@@ -119,15 +119,15 @@
                                     <label>Role</label>
 
                                     <select name="role"
-                                        class="form-control">
+        id="role"
+        class="form-control">
 
-                                        <option value="">Select Role</option>
+    <option value="">Select Role</option>
+    <option value="d_officer">District Officer</option>
+    <option value="teacher">Teacher</option>
+    <option value="headmaster">Head Master</option>
 
-                                            <option value="d_officer">District Officer</option>
-                                            <option value="teacher">Teacher</option>
-                                            <option value="headmaster">Head Master</option>
-
-                                    </select>
+</select>
 
                                 </div>
                                 <div class="col-md-4 mb-3">
@@ -151,26 +151,25 @@
 
                                 </div>
 
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-4 mb-3" id="schoolField" style="display:none;">
 
-                                    <label>School</label>
+    <label>School</label>
 
-                                    <select name="school_id"
-                                        class="form-control">
+    <select name="school_id" class="form-control">
 
-                                        <option value="">Select School</option>
+        <option value="">Select School</option>
 
-                                        @foreach ($schools as $school)
+        @foreach ($schools as $school)
 
-                                            <option value="{{ $school->id }}">
-                                                {{ $school->school_name }}
-                                            </option>
+            <option value="{{ $school->id }}">
+                {{ $school->school_name }}
+            </option>
 
-                                        @endforeach
+        @endforeach
 
-                                    </select>
+    </select>
 
-                                </div>
+</div>
 
                             </div>
 
@@ -576,5 +575,27 @@
     </div>
 
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const role = document.getElementById('role');
+    const schoolField = document.getElementById('schoolField');
+
+    function toggleSchoolField() {
+
+        if (role.value === 'teacher' || role.value === 'headmaster') {
+            schoolField.style.display = 'block';
+        } else {
+            schoolField.style.display = 'none';
+        }
+
+    }
+
+    role.addEventListener('change', toggleSchoolField);
+
+    toggleSchoolField();
+
+});
+</script>
 {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> --}}
 @endsection
