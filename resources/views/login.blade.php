@@ -80,7 +80,7 @@
 <div class="login-card">
     
     <h4 class="login-title text-center">
-        Teachers Daily Recording <br> Management System
+        Digital Teachers workbooks and Supervision Management System
     </h4>
     @if(session('success'))
     <span style="color: green">{{ $session('sucess') }}</span>

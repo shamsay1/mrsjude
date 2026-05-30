@@ -82,7 +82,8 @@
 <div class="login-card">
     
     <h4 class="login-title text-center">
-        Teachers Daily Recording <br> Management System
+        Digital Teachers workbooks and Supervision Management System
+        
     </h4>
 
     <p class="text-center text-muted mb-3" style="font-size: 14px;">
