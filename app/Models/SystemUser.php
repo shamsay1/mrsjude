@@ -18,7 +18,8 @@ class SystemUser extends Authenticatable
         "role",
         "school_id",
         "district_id",
-        "password"
+        "password",
+        "status"
     ];
     public function district()
     {

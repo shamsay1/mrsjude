@@ -9,7 +9,8 @@ class School extends Model
     protected $fillable = [
         "school_name",
         "school_code",
-        "district_id"
+        "district_id",
+        "status"
     ];
 
      public function district()

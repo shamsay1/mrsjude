@@ -78,3 +78,12 @@ Route::put('/schemes/{id}', [SchemeOfWorkController::class, 'update'])->name('sc
 Route::delete('/schemes/{id}', [SchemeOfWorkController::class, 'destroy'])->name('scheme.destroy');
 Route::get('/schemes/{teacher}', [SchemeOfWorkController::class, 'index1'])
     ->name('scheme.index1');
+Route::patch('/district/{id}/toggle-status',
+    [DistrictController::class, 'toggleStatus'])
+    ->name('district.toggle-status');
+Route::patch('/school/{id}/toggle-status',
+    [SchoolController::class, 'toggleStatus'])
+    ->name('school.toggle-status');
+Route::patch('/system-user/{id}/toggle-status',
+    [UserController::class, 'toggleStatus'])
+    ->name('system-user.toggle-status');

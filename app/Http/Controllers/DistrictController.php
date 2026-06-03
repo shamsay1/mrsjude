@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\District;
 use Illuminate\Http\Request;
+use Exception;
 
 class DistrictController extends Controller
 {
@@ -14,7 +15,9 @@ class DistrictController extends Controller
         return view('district', compact('districts'));
     }
     public function store(Request $request)
-    {
+{
+    try {
+
         $request->validate([
             'district_name' => 'required'
         ]);
@@ -25,7 +28,15 @@ class DistrictController extends Controller
 
         return redirect()->back()
             ->with('success', 'District added successfully');
+
+    } catch (Exception $e) {
+
+        return redirect()->back()
+            ->with('error', $e->getMessage());
+
+        
     }
+}
 
     // Update data
     public function update(Request $request, $id)
@@ -44,14 +55,18 @@ class DistrictController extends Controller
             ->with('success', 'District updated successfully');
     }
 
-    // Delete data
-    public function destroy($id)
-    {
-        $district = District::findOrFail($id);
+    // DeActive data
+    public function toggleStatus($id)
+{
+    $district = District::findOrFail($id);
 
-        $district->delete();
+    $district->status = $district->status == 'Active'
+        ? 'Deactive'
+        : 'Active';
 
-        return redirect()->back()
-            ->with('success', 'District deleted successfully');
-    }
+    $district->save();
+
+    return redirect()->back()
+        ->with('success', 'District status updated successfully.');
+}
 }

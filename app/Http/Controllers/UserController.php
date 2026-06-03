@@ -8,6 +8,7 @@ use App\Models\SystemUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Exception;
 
 class UserController extends Controller
 {
@@ -93,18 +94,27 @@ class UserController extends Controller
 }
 
     // Store
-    public function store(Request $request)
-    {
+ public function store(Request $request)
+{
+    try {
+
         $request->validate([
-            'firstname' => 'required',
-            'middlename' => 'required',
-            'lastname' => 'required',
+            'firstname' => 'required|string',
+            'middlename' => 'required|string',
+            'lastname' => 'required|string',
             'email' => 'required|email|unique:system_users,email',
             'gender' => 'required',
-            'district_id' => 'required',
             'role' => 'required',
-            'password' => 'required'
+            'password' => 'required|min:4'
         ]);
+
+        $districtId = Auth::user()->role == 'admin'
+            ? $request->district_id
+            : Auth::user()->district_id;
+
+        $schoolId = Auth::user()->role == 'admin'
+            ? $request->school_id
+            : Auth::user()->school_id;
 
         SystemUser::create([
             'firstname' => $request->firstname,
@@ -113,15 +123,21 @@ class UserController extends Controller
             'email' => $request->email,
             'gender' => $request->gender,
             'role' => $request->role,
-            'district_id' => $request->district_id,
-            'school_id' => $request->school_id,
-            'password' => Hash::make($request->password)
+            'district_id' => $districtId,
+            'school_id' => $schoolId,
+            'password' => Hash::make($request->password),
+            'status' => 'Active'
         ]);
 
         return redirect()->back()
             ->with('success', 'User added successfully');
-    }
 
+    } catch (Exception $e) {
+
+    return redirect()->back()
+        ->with('error', $e->getMessage());
+}
+}
     // Update
     public function update(Request $request, $id)
     {
@@ -160,17 +176,19 @@ class UserController extends Controller
             ->with('success', 'User updated successfully');
     }
 
-    // Delete
-    public function destroy($id)
-    {
-        $user = SystemUser::findOrFail($id);
+    public function toggleStatus($id)
+{
+    $user = SystemUser::findOrFail($id);
 
-        $user->delete();
+    $user->status = $user->status == 'Active'
+        ? 'Deactive'
+        : 'Active';
 
-        return redirect()->back()
-            ->with('success', 'User deleted successfully');
-    }
+    $user->save();
 
+    return redirect()->back()
+        ->with('success', 'User status updated successfully.');
+}
     public function profile(){
         return view("profile");
     }

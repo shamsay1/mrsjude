@@ -13,6 +13,12 @@
             data-bs-target="#addUserModal">
             + Add User
         </button>
+        @elseif (Auth::user()->role == "headmaster")
+        <button class="btn btn-primary mb-3"
+            data-bs-toggle="modal"
+            data-bs-target="#addUserModal">
+            + Add New Teacher
+        </button>
         @endif
 
         <!-- Add Modal -->
@@ -123,13 +129,20 @@
         class="form-control">
 
     <option value="">Select Role</option>
+        @if (Auth::user()->role == "admin")
+
     <option value="d_officer">District Officer</option>
-    <option value="teacher">Teacher</option>
     <option value="headmaster">Head Master</option>
+     @else
+    <option value="teacher">Teacher</option>
+    @endif
 
 </select>
 
                                 </div>
+                                @if (Auth::user()->role=="admin")
+                                    
+                                
                                 <div class="col-md-4 mb-3">
 
                                     <label>District</label>
@@ -150,6 +163,7 @@
                                     </select>
 
                                 </div>
+                                @endif
 
                                 <div class="col-md-4 mb-3" id="schoolField" style="display:none;">
 
@@ -315,6 +329,7 @@
                     <th>Gender</th>
                     <th>District</th>
                     <th>School</th>
+                    <th>Status</th>
                     <th>Role</th>
                     <th>Action</th>
 
@@ -344,6 +359,13 @@
 
                         <td>{{ $user->school->school_name ?? 'N/A' }}</td>
                         <td>
+                            @if($user->status == 'Active')
+                                <span class="badge bg-success">Active</span>
+                            @else
+                                <span class="badge bg-danger">Deactive</span>
+                            @endif
+                        </td>
+                        <td>
                             <span class="badge bg-success">
                                 {{ $user->role }}
                             </span>
@@ -361,21 +383,22 @@
                             </button>
 
                             <!-- Delete -->
-                            <form action="{{ route('system-user.destroy', $user->id) }}"
-                                method="POST"
-                                style="display:inline-block;">
+                            <form action="{{ route('system-user.toggle-status', $user->id) }}"
+      method="POST"
+      style="display:inline-block;">
 
-                                @csrf
-                                @method('DELETE')
+    @csrf
+    @method('PATCH')
 
-                                <button class="btn btn-sm btn-danger"
-                                    onclick="return confirm('Delete this user?')">
+    <button
+        class="btn btn-sm {{ $user->status == 'Active' ? 'btn-danger' : 'btn-success' }}"
+        onclick="return confirm('Are you sure you want to {{ $user->status == 'Active' ? 'deactivate' : 'activate' }} this user?')">
 
-                                    Delete
+        {{ $user->status == 'Active' ? 'Deactivate' : 'Activate' }}
 
-                                </button>
+    </button>
 
-                            </form>
+</form>
 
                             <!-- Edit Modal -->
                             <div class="modal fade"
@@ -575,6 +598,91 @@
     </div>
 
 </div>
+@if(session('success') || session('error'))
+
+<div class="modal fade" id="successModal" tabindex="-1">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content text-center">
+
+            @if(session('success'))
+
+                <div class="modal-body p-5">
+
+                    <i class="fas fa-check-circle text-success"
+                       style="font-size:80px;"></i>
+
+                    <h3 class="mt-3 text-success">
+                        Success
+                    </h3>
+
+                    <p style="color:green">
+                        {{ session('success') }}
+                    </p>
+
+                    <button type="button"
+                            class="btn btn-success"
+                            data-bs-dismiss="modal">
+                        OK
+                    </button>
+
+                </div>
+
+            @endif
+
+            @if(session('error') || $errors->any())
+
+<div class="modal-body p-5">
+
+    <i class="fas fa-times-circle text-danger"
+       style="font-size:80px;"></i>
+
+    <h3 class="mt-3 text-danger">
+        Failed
+    </h3>
+
+    @if(session('error'))
+        <p style="color:red">
+            {{ session('error') }}
+        </p>
+    @endif
+
+    @if($errors->any())
+        <ul class="text-danger text-start">
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    @endif
+
+    <button type="button"
+            class="btn btn-danger"
+            data-bs-dismiss="modal">
+        OK
+    </button>
+
+</div>
+
+@endif
+
+        </div>
+
+    </div>
+
+</div>
+
+@endif
+@if(session('success') || session('error'))
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    let modal = new bootstrap.Modal(
+        document.getElementById('successModal')
+    );
+    modal.show();
+});
+</script>
+@endif
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -583,7 +691,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function toggleSchoolField() {
 
-        if (role.value === 'teacher' || role.value === 'headmaster') {
+        if (role.value === 'headmaster') {
             schoolField.style.display = 'block';
         } else {
             schoolField.style.display = 'none';

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ClassRoom;
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Exception;
 
 class StudentController extends Controller
 {
@@ -20,7 +21,9 @@ class StudentController extends Controller
     }
 
     public function store(Request $request)
-    {
+{
+    try {
+
         $request->validate([
             'firstname' => 'required',
             'middlename' => 'required',
@@ -39,7 +42,14 @@ class StudentController extends Controller
 
         return redirect()->back()
             ->with('success', 'Student added successfully');
+
+    } catch (Exception $e) {
+
+        return redirect()->back()
+            ->withInput()
+            ->with('error', $e->getMessage());
     }
+}
 
     public function update(Request $request, $id)
     {

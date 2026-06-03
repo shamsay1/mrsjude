@@ -198,7 +198,16 @@ body {
 <div class="sidebar" id="sidebar">
     
     <div class="sidebar-header">
+        @if (Auth::user()->role== "admin")
         Admin
+        @elseif (Auth::user()->role== "headmaster")
+        H.Master
+        @elseif (Auth::user()->role== "teacher")
+
+        Teacher
+        @else
+        D.Officer
+        @endif
     </div>
 
     @php
@@ -340,50 +349,7 @@ body {
         <h6 class="mb-0">Dashboard</h6>
     </div>
 
-    <!-- Notification -->
-    @if (Auth::user()->role == "admin")
-    <div class="dropdown">
-        <button class="btn position-relative" data-bs-toggle="dropdown">
-            <i class="bi bi-bell fs-5"></i>
-
-            <!-- Badge -->
-            
-              <span class="position-absolute badge rounded-pill bg-danger" style="margin-left: -13px">
-               7
-            </span>
-        </button>
-
-        <!-- Dropdown Card -->
-        <div class="dropdown-menu dropdown-menu-end p-3 shadow" style="width:320px; max-height:400px; overflow:hidden;">
     
-    <div class="d-flex justify-content-between align-items-center mb-2">
-        <h6 class="mb-0">Notifications</h6>
-        <form action="" method="POST">
-            @csrf
-            @method('DELETE')
-            <button class="btn btn-sm btn-danger">
-                Delete All
-            </button>
-        </form>
-    </div>
-
-    <!-- Scrollable area -->
-    <div id="notificationList" style="max-height:300px; overflow-y:auto;">
-
-        {{-- @foreach ($note as $n)
-        <div class="border-bottom mb-2">
-            <p class="mb-1 fw-bold">{{ $n->title }}</p>
-            <p class="mb-1">{{ $n->action }}</p>
-            <small class="text-muted">{{ $n->created_at->diffForHumans() }}</small>
-        </div>
-        @endforeach --}}
-
-    </div>
-</div>
-    </div>
-        
-    @endif
-
 </div>
 
 <!-- Content -->

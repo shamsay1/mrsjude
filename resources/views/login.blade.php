@@ -123,7 +123,7 @@
             Login
         </button>
         @if(session("error"))
-            <span style="color: red">{{ session("error") }}</span>
+            <span style="color: red;text-align: center">{{ session("error") }}</span>
         @endif
 
     </form>

@@ -15,7 +15,7 @@ class DailyRecordController extends Controller
 {
     $user = Auth::user();
 
-    // Daily records za teacher aliyelogin tu
+    
     $records = DailyRecording::with([
             'teacher',
             'school',

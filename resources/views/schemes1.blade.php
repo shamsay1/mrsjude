@@ -140,7 +140,7 @@
 
                                 <div class="col-md-6 mb-3">
                                     <label>Week</label>
-                                    <input type="number" name="week" class="form-control">
+                                    <input type="number" min="1" name="week" class="form-control">
                                 </div>
 
                                 <div class="col-md-6 mb-3">

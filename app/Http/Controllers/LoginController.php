@@ -20,6 +20,9 @@ class LoginController extends Controller
         if(Auth::attempt($credentials)){
             return redirect()->route("dashboard");
         }
+        else{
+            return back()->with("error","wrong username/password");
+        }
     }
      public function destroy(Request $request)
     {
@@ -50,7 +53,7 @@ class LoginController extends Controller
     {
         return view('resetpassword1', [
             'token' => $token,
-            'email' => $request->query('email') // email inakuja kama query param
+            'email' => $request->query('email') 
         ]);
     }
     public function updatePassword(Request $request)

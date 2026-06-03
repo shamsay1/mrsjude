@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class District extends Model
 {
     protected $fillable = [
-        "district_name"
+        "district_name",
+        "status"
     ];
     public function schools()
 {

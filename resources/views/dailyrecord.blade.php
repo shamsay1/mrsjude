@@ -46,25 +46,24 @@
 
                                     <label>Teacher</label>
 
-                                    <select name="teacher_id"
-                                        class="form-control">
+                                   <select name="teacher_id" class="form-control">
 
-                                        <option value="">
-                                            Select Teacher
-                                        </option>
+    <option value="">Select Teacher</option>
 
-                                        @foreach ($teachers as $teacher)
+    @foreach ($teachers as $teacher)
 
-                                            <option value="{{ $teacher->id }}">
+        <option value="{{ $teacher->id }}"
+            {{ Auth::id() == $teacher->id ? 'selected' : '' }}>
 
-                                                {{ $teacher->firstname }}
-                                                {{ $teacher->lastname }}
+            {{ $teacher->firstname }}
+            {{ $teacher->middlename }}
+            {{ $teacher->lastname }}
 
-                                            </option>
+        </option>
 
-                                        @endforeach
+    @endforeach
 
-                                    </select>
+</select>
 
                                 </div>
 
@@ -172,7 +171,7 @@
 
                             <div class="mb-3">
 
-                                <label>Remarks</label>
+                                <label>Evaluation</label>
 
                                 <textarea name="remarks"
                                     rows="2"

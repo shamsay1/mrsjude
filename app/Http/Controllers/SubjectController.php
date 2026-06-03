@@ -7,6 +7,7 @@ use App\Models\Subject;
 use App\Models\SystemUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Exception;
 
 class SubjectController extends Controller
 {
@@ -33,7 +34,9 @@ class SubjectController extends Controller
 
     // Store Data
     public function store(Request $request)
-    {
+{
+    try {
+
         $request->validate([
             'subjectName' => 'required',
             'subjectCode' => 'required',
@@ -50,8 +53,14 @@ class SubjectController extends Controller
 
         return redirect()->back()
             ->with('success', 'Subject added successfully');
-    }
 
+    } catch (Exception $e) {
+
+        return redirect()->back()
+            ->withInput()
+            ->with('error', $e->getMessage());
+    }
+}
     // Update Data
     public function update(Request $request, $id)
     {

@@ -7,25 +7,36 @@ use App\Models\School;
 use App\Models\SystemUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Exception;
 
 class SchoolController extends Controller
 {
     public function index()
     {
-        $schools = School::with('district')->latest()->get();
+        $schools = School::with('district')->orderBy("school_code","asc")->latest()->get();
+        $school = School::latest()->first();
 
+        $nextNumber = $school
+            ? (int) substr($school->school_code, -4) + 1
+            : 1;
+
+        $schoolCode = 'SCH-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
         $districts = District::all();
 
         return view('school', compact(
             'schools',
-            'districts'
+            'districts',
+            'schoolCode'
         ));
     }
-    public function store(Request $request)
-    {
+
+public function store(Request $request)
+{
+    try {
+
         $request->validate([
             'school_name' => 'required',
-            'school_code' => 'required',
+            'school_code' => 'required|unique:schools,school_code',
             'district_id' => 'required'
         ]);
 
@@ -37,7 +48,17 @@ class SchoolController extends Controller
 
         return redirect()->back()
             ->with('success', 'School added successfully');
+
+    } catch (Exception $e) {
+
+        return redirect()->back()
+            ->withInput()
+            ->with('error', $e->getMessage());
+
+        // Production:
+        // ->with('error', 'Failed to add school');
     }
+}
 
     // Update data
     public function update(Request $request, $id)
@@ -61,15 +82,19 @@ class SchoolController extends Controller
     }
 
     // Delete data
-    public function destroy($id)
-    {
-        $school = School::findOrFail($id);
+   public function toggleStatus($id)
+{
+    $school = School::findOrFail($id);
 
-        $school->delete();
+    $school->status = $school->status == 'Active'
+        ? 'Deactive'
+        : 'Active';
 
-        return redirect()->back()
-            ->with('success', 'School deleted successfully');
-    }
+    $school->save();
+
+    return redirect()->back()
+        ->with('success', 'School status updated successfully.');
+}
 
     public function schoold()
 {

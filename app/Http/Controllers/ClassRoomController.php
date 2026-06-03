@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Exception;
 use App\Models\ClassRoom;
 use App\Models\School;
 use Illuminate\Http\Request;
@@ -26,8 +26,10 @@ class ClassRoomController extends Controller
     }
 
     // Store Data
-    public function store(Request $request)
-    {
+   public function store(Request $request)
+{
+    try {
+
         $request->validate([
             'class_name' => 'required',
             'class_level' => 'required',
@@ -41,7 +43,14 @@ class ClassRoomController extends Controller
 
         return redirect()->back()
             ->with('success', 'Class added successfully');
+
+    } catch (Exception $e) {
+
+        return redirect()->back()
+            ->withInput()
+            ->with('error', $e->getMessage());
     }
+}
 
     // Update Data
     public function update(Request $request, $id)
