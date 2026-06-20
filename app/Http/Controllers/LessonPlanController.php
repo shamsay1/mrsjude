@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\LessonPlan;
+use App\Models\Student;
 use App\Models\Subject;
+use App\Models\SubTopic;
+use App\Models\Topic;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,8 +15,6 @@ class LessonPlanController extends Controller
     public function index()
 {
     $user = Auth::user();
-
-    // Lesson plans za teacher aliyelogin tu
     $lessonPlans = LessonPlan::with([
             'subject.teacher',
             'subject.classRoom.school'
@@ -26,13 +27,35 @@ class LessonPlanController extends Controller
         ->latest()
         ->get();
 
-    // Subjects za teacher huyo tu
+    $male = Student::where('gender', 'Male')->count();
+
+    $female = Student::where('gender', 'Female')->count();
+
+    $total = Student::count();
     $subjects = Subject::where('teacher_id', $user->id)->get();
 
     return view('lessonplan', compact(
         'lessonPlans',
-        'subjects'
+        'subjects',
+        'male',
+        'female',
+        'total'
     ));
+}
+public function getTopics($subjectId)
+{
+    return Topic::where(
+        'subject_id',
+        $subjectId
+    )->get();
+}
+
+public function getSubTopics($topicId)
+{
+    return SubTopic::where(
+        'topic_id',
+        $topicId
+    )->get();
 }
 
     // Store Data
@@ -40,8 +63,8 @@ class LessonPlanController extends Controller
     {
         $request->validate([
             'subject_id' => 'required',
-            'topic' => 'required',
-            'subtopic' => 'required',
+            'topic_id' => 'required',
+            'sub_topic_id' => 'required',
             'objectives' => 'required',
             'teaching_methods' => 'required',
             'teaching_materials' => 'required',
@@ -50,15 +73,17 @@ class LessonPlanController extends Controller
         ]);
 
         LessonPlan::create([
-            'subject_id' => $request->subject_id,
-            'topic' => $request->topic,
-            'subtopic' => $request->subtopic,
-            'objectives' => $request->objectives,
-            'teaching_methods' => $request->teaching_methods,
-            'teaching_materials' => $request->teaching_materials,
-            'evaluation' => $request->evaluation,
-            'lesson_date' => $request->lesson_date
-        ]);
+    'subject_id' => $request->subject_id,
+    'school_id' => Auth::user()->school_id,
+    'topic_id' => $request->topic_id,
+    'sub_topic_id' => $request->sub_topic_id,
+    'lesson_date' => $request->lesson_date,
+    'objectives' => $request->objectives,
+    'teaching_methods' => $request->teaching_methods,
+    'teaching_materials' => $request->teaching_materials,
+    'evaluation' => $request->evaluation,
+    'status'             => 'completed',
+]);
 
         return redirect()->back()
             ->with('success', 'Lesson Plan added successfully');

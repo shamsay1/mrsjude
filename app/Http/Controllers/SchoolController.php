@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\District;
+use App\Models\Order;
 use App\Models\School;
 use App\Models\SystemUser;
 use Illuminate\Http\Request;
@@ -111,10 +112,26 @@ public function store(Request $request)
     return view('viewteacher', compact('school', 'teachers'));
 }
 
- public function showtl(){
-    $school = School::where('id', Auth::user()->school_id)->get();
-    $teachers = SystemUser::where('role','teacher')->where('school_id', Auth::user()->school_id)->get();
-    return view('viewteacher', compact('school', 'teachers'));
+public function showtl()
+{
+    $schoolId = Auth::user()->school_id;
 
- }
+    if(Auth::user()->role == 'supervisor')
+    {
+        $schoolId = Order::where('supervisor_id', Auth::id())
+            ->latest()
+            ->value('school_id');
+    }
+
+    $school = School::find($schoolId);
+
+    $teachers = SystemUser::where('role', 'teacher')
+        ->where('school_id', $schoolId)
+        ->get();
+
+    return view('viewteacher', compact(
+        'school',
+        'teachers'
+    ));
+}
 }

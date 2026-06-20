@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\District;
 use App\Models\School;
+use App\Models\Student;
 use App\Models\SystemUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,6 +18,9 @@ class UserController extends Controller
         $schools = School::all();
         $total_school = School::all()->count();
         $total_district = District::all()->count();
+        $total_school_teachers = SystemUser::where("role","teacher")->where("school_id",Auth::user()->school_id)->count();
+        $total_school_students = Student::where("school_id",Auth::user()->school_id)->count();
+        $total_school_class = Student::where("school_id",Auth::user()->school_id)->count();
         if(Auth::user()->role=="d_officer"){
         $total_teachers = SystemUser::where("role","teacher")->where('district_id',Auth::user()->district_id)->count();
         $total_school = School::all()->where('district_id',Auth::user()->district_id)->count();
@@ -45,7 +49,8 @@ class UserController extends Controller
 
             $schoolCounts[] = $district->schools_count;
         }
-        return view("dashboard",compact('total_school','total_district','total_headmaster','total_teachers','schoolNames', 'teacherCounts','districtNames', 'schoolCounts'));
+        $recentUsers = SystemUser::where("school_id",Auth::user()->school_id)->where("role","!=","headmaster")->take(5)->get();
+        return view("dashboard",compact('recentUsers','total_school','total_district','total_headmaster','total_teachers','schoolNames', 'teacherCounts','districtNames', 'schoolCounts','total_school_class','total_school_students','total_school_teachers'));
     }
     public function index(Request $request)
 {

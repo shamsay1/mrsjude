@@ -17,7 +17,6 @@ class SystemUser extends Authenticatable
         "gender",
         "role",
         "school_id",
-        "district_id",
         "password",
         "status"
     ];
@@ -32,5 +31,9 @@ class SystemUser extends Authenticatable
     public function subjects()
 {
     return $this->hasMany(Subject::class, 'teacher_id');
+}
+    public function orders()
+{
+    return $this->hasMany(Order::class, 'supervisor_id');
 }
 }

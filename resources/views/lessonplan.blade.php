@@ -1,6 +1,40 @@
 @extends("layout.app")
 <style>
+    .step {
+    display: none;
+}
 
+.step.active {
+    display: block;
+}
+
+.step-indicator {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.step-indicator .circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #dee2e6;
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 10px;
+    font-weight: bold;
+}
+
+.step-indicator .circle.active {
+    background: #0d6efd;
+    color: white;
+}
+
+.progress {
+    height: 8px;
+}
     .lesson-paper{
         width: 100%;
         background: #fff;
@@ -114,6 +148,7 @@
     <div class="table-container">
 
         <!-- Add Lesson Plan Button -->
+        @if(Auth::user()->role =="teacher")
         <button class="btn btn-primary mb-3"
             data-bs-toggle="modal"
             data-bs-target="#addLessonPlanModal">
@@ -121,144 +156,348 @@
             + Add Lesson Plan
 
         </button>
+        @endif
 
         <!-- Add Modal -->
-        <div class="modal fade" id="addLessonPlanModal" tabindex="-1">
+       <div class="modal fade" id="addLessonPlanModal" tabindex="-1">
 
-            <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-xl">
 
-                <div class="modal-content">
+        <div class="modal-content">
 
-                    <div class="modal-header bg-primary text-white">
+            <div class="modal-header bg-primary text-white">
 
-                        <h5>Add Lesson Plan</h5>
+                <h5>Add Lesson Plan</h5>
 
-                        <button class="btn-close"
-                            data-bs-dismiss="modal"></button>
-
-                    </div>
-
-                    <form action="{{ route('lesson-plan.store') }}"
-                        method="POST">
-
-                        @csrf
-
-                        <div class="modal-body">
-
-                            <div class="row">
-
-                                <div class="col-md-6 mb-3">
-
-                                    <label>Subject</label>
-
-                                    <select name="subject_id"
-                                        class="form-control">
-
-                                        <option value="">
-                                            Select Subject
-                                        </option>
-
-                                        @foreach ($subjects as $subject)
-
-                                            <option value="{{ $subject->id }}">
-                                                {{ $subject->subjectName }}
-                                            </option>
-
-                                        @endforeach
-
-                                    </select>
-
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-
-                                    <label>Lesson Date</label>
-
-                                    <input type="date"
-                                        name="lesson_date"
-                                        class="form-control">
-
-                                </div>
-
-                            </div>
-
-                            <div class="mb-3">
-
-                                <label>Topic</label>
-
-                                <input type="text"
-                                    name="topic"
-                                    class="form-control">
-
-                            </div>
-
-                            <div class="mb-3">
-
-                                <label>Sub Topic</label>
-
-                                <input type="text"
-                                    name="subtopic"
-                                    class="form-control">
-
-                            </div>
-
-                            <div class="mb-3">
-
-                                <label>Objectives</label>
-
-                                <textarea name="objectives"
-                                    class="form-control"
-                                    rows="3"></textarea>
-
-                            </div>
-
-                            <div class="mb-3">
-
-                                <label>Teaching Methods</label>
-
-                                <textarea name="teaching_methods"
-                                    class="form-control"
-                                    rows="3"></textarea>
-
-                            </div>
-
-                            <div class="mb-3">
-
-                                <label>Teaching Materials</label>
-
-                                <textarea name="teaching_materials"
-                                    class="form-control"
-                                    rows="3"></textarea>
-
-                            </div>
-
-                            <div class="mb-3">
-
-                                <label>Evaluation</label>
-
-                                <textarea name="evaluation"
-                                    class="form-control"
-                                    rows="3"></textarea>
-
-                            </div>
-
-                        </div>
-
-                        <div class="modal-footer">
-
-                            <button class="btn btn-success">
-                                Save Lesson Plan
-                            </button>
-
-                        </div>
-
-                    </form>
-
-                </div>
+                <button class="btn-close"
+                    data-bs-dismiss="modal"></button>
 
             </div>
 
+            <form action="{{ route('lesson-plan.store') }}"
+                method="POST">
+
+                @csrf
+
+                <div class="modal-body">
+
+                    <!-- Progress -->
+                    <div class="text-center mb-3">
+                        <h6 id="stepText">Step 1 of 4</h6>
+                    </div>
+
+                    <div class="progress mb-4">
+                        <div id="progressBar"
+                            class="progress-bar"
+                            style="width:25%">
+                        </div>
+                    </div>
+
+                    <div class="step-indicator">
+                        <div class="circle active">1</div>
+                        <div class="circle">2</div>
+                        <div class="circle">3</div>
+                        <div class="circle">4</div>
+                    </div>
+
+                    <!-- STEP 1 -->
+                    <div class="step active">
+
+                        <div class="row">
+
+                            <div class="col-md-6 mb-3">
+
+                                <label>Subject</label>
+
+                                <select name="subject_id"
+                                    id="subject_id"
+                                    class="form-control"
+                                    required>
+
+                                    <option value="">
+                                        Select Subject
+                                    </option>
+
+                                    @foreach ($subjects as $subject)
+
+                                        <option value="{{ $subject->id }}">
+                                            {{ $subject->subjectName }}
+                                        </option>
+
+                                    @endforeach
+
+                                </select>
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                <label>Lesson Date</label>
+
+                                <input type="date"
+    name="lesson_date"
+    class="form-control"
+    value="{{ date('Y-m-d') }}"
+    required>
+
+                            </div>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label>Topic</label>
+
+                            <select name="topic_id"
+                                id="topic_id"
+                                class="form-control"
+                                required>
+
+                                <option value="">
+                                    Select Topic
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                    <!-- STEP 2 -->
+                    <div class="step">
+
+                        <div class="mb-3">
+
+                            <label>Sub Topic</label>
+
+                            <select name="sub_topic_id"
+                                id="sub_topic_id"
+                                class="form-control"
+                                required>
+
+                                <option value="">
+                                    Select Sub Topic
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label>Objectives</label>
+
+                            <textarea name="objectives"
+    rows="4"
+    class="form-control"
+    required>The student should be able to </textarea>
+
+                        </div>
+
+                    </div>
+
+                    <!-- STEP 3 -->
+                    <div class="step">
+
+                        <div class="mb-3">
+
+    <label>Teaching Method</label>
+
+    <select name="teaching_methods"
+        class="form-control"
+        required>
+
+        <option value="">
+            Select Teaching Method
+        </option>
+
+        <option value="Question and Answer">
+            Question and Answer
+        </option>
+
+        <option value="Group Discussion">
+            Group Discussion
+        </option>
+
+        <option value="Lecture Method">
+            Lecture Method
+        </option>
+
+        <option value="Demonstration">
+            Demonstration
+        </option>
+
+        <option value="Brainstorming">
+            Brainstorming
+        </option>
+
+        <option value="Role Play">
+            Role Play
+        </option>
+
+        <option value="Project Work">
+            Project Work
+        </option>
+
+        <option value="Practical Work">
+            Practical Work
+        </option>
+
+        <option value="Presentation">
+            Presentation
+        </option>
+
+        <option value="Peer Teaching">
+            Peer Teaching
+        </option>
+
+        <option value="Case Study">
+            Case Study
+        </option>
+
+    </select>
+
+</div>
+
+                        <div class="mb-3">
+
+                            <label>Teaching Materials</label>
+
+                            <textarea name="teaching_materials"
+                                rows="4"
+                                class="form-control"
+                                required>Chalk,Blackboard,Stick,Manila,Pictures,Charts</textarea>
+
+                        </div>
+
+                    </div>
+
+                    <!-- STEP 4 -->
+                    <div class="step">
+
+                        <div class="mb-3">
+
+                            <label>Evaluation</label>
+
+                            <textarea name="evaluation"
+                                rows="4"
+                                class="form-control"
+                                required></textarea>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                        id="prevBtn"
+                        class="btn btn-secondary">
+                        Back
+                    </button>
+
+                    <button type="button"
+                        id="nextBtn"
+                        class="btn btn-primary">
+                        Next
+                    </button>
+
+                    <button type="submit"
+                        id="submitBtn"
+                        class="btn btn-success"
+                        style="display:none;">
+                        Save Lesson Plan
+                    </button>
+
+                </div>
+
+            </form>
+
         </div>
+
+    </div>
+
+</div>
+
+<script>
+
+document.getElementById('subject_id')
+.addEventListener('change', function () {
+
+    let subjectId = this.value;
+
+    let topicSelect =
+        document.getElementById('topic_id');
+
+    let subTopicSelect =
+        document.getElementById('sub_topic_id');
+
+    topicSelect.innerHTML =
+        '<option value="">Loading Topics...</option>';
+
+    subTopicSelect.innerHTML =
+        '<option value="">Select Sub Topic</option>';
+
+    fetch('/get-topics/' + subjectId)
+
+        .then(response => response.json())
+
+        .then(data => {
+
+            topicSelect.innerHTML =
+                '<option value="">Select Topic</option>';
+
+            data.forEach(topic => {
+
+                topicSelect.innerHTML += `
+                    <option value="${topic.id}">
+                        ${topic.topic_name}
+                    </option>
+                `;
+
+            });
+
+        });
+
+});
+
+document.getElementById('topic_id')
+.addEventListener('change', function () {
+
+    let topicId = this.value;
+
+    let subTopicSelect =
+        document.getElementById('sub_topic_id');
+
+    subTopicSelect.innerHTML =
+        '<option value="">Loading Sub Topics...</option>';
+
+    fetch('/get-subtopics/' + topicId)
+
+        .then(response => response.json())
+
+        .then(data => {
+
+            subTopicSelect.innerHTML =
+                '<option value="">Select Sub Topic</option>';
+
+            data.forEach(subTopic => {
+
+                subTopicSelect.innerHTML += `
+                    <option value="${subTopic.id}">
+                        ${subTopic.sub_topic_name}
+                    </option>
+                `;
+
+            });
+
+        });
+
+});
+
+</script>
 
         <!-- Display Lesson Plans -->
        @forelse ($lessonPlans as $plan)
@@ -362,14 +601,15 @@
                 <tbody>
 
                     <tr>
+                        
 
-                        <td>{{ $plan->registered_girls ?? '..............' }}</td>
-                        <td>{{ $plan->registered_boys ?? '..............' }}</td>
-                        <td>{{ $plan->registered_total ?? '..............' }}</td>
+                        {{-- <td>{{ $female}}</td>
+                        <td>{{ $male}}</td>
+                        <td>{{ $total}}</td> --}}
 
-                        <td>{{ $plan->present_girls ?? '..............' }}</td>
-                        <td>{{ $plan->present_boys ?? '..............' }}</td>
-                        <td>{{ $plan->present_total ?? '..............' }}</td>
+                        <td>{{ $female ?? '..............' }}</td>
+                        <td>{{ $male ?? '..............' }}</td>
+                        <td>{{ $total ?? '..............' }}</td>
 
                     </tr>
 
@@ -380,12 +620,12 @@
             <!-- MAIN COMPETENCE -->
 
             <div class="section-title">
-                Main Competence:
+                Main Topic:
             </div>
 
             <div class="content-box">
-                {{ $plan->topic }}
-            </div>
+    {{ $plan->topic?->topic_name }}
+</div>
 
             <!-- SUB TOPIC -->
 
@@ -394,8 +634,8 @@
             </div>
 
             <div class="content-box">
-                {{ $plan->subtopic }}
-            </div>
+    {{ $plan->subTopic?->sub_topic_name }}
+</div>
 
             <!-- OBJECTIVES -->
 
@@ -432,7 +672,13 @@
         <!-- BUTTONS -->
 
         <div class="mt-4 no-print">
+            <button class="btn btn-success"
+        data-bs-toggle="modal"
+        data-bs-target="#stageModal{{ $plan->id }}">
 
+        Manage Stages
+
+    </button>
             <button class="btn btn-primary"
                 data-bs-toggle="modal"
                 data-bs-target="#editLessonPlan{{ $plan->id }}">
@@ -468,6 +714,92 @@
 
     </div>
 
+    <div class="modal fade" id="stageModal{{ $plan->id }}">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+
+            <div class="modal-header bg-success text-white">
+                <h5>Lesson Plan Stages</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form action="{{ route('lesson-plan-stage.store') }}"
+                  method="POST">
+
+                @csrf
+
+                <input type="hidden"
+                       name="lesson_plan_id"
+                       value="{{ $plan->id }}">
+
+                <div class="modal-body">
+
+                    <table class="table table-bordered">
+
+                        <thead>
+
+                            <tr>
+                                <th>Stage</th>
+                                <th>Minutes</th>
+                                <th>Teaching Activities</th>
+                                <th>Learning Activities</th>
+                                <th>Assessment</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+    @php
+    $stages = [
+        'Introduction',
+        'Competence Development',
+        'Design',
+        'Realisation'
+    ];
+    @endphp
+
+    @foreach($stages as $index => $stage)
+    <tr>
+        <td>
+            {{ $stage }}
+            <input type="hidden" name="stages[{{ $index }}][stage_name]" value="{{ $stage }}">
+        </td>
+        <td>
+            <input type="number" name="stages[{{ $index }}][minutes]" class="form-control" required>
+        </td>
+        <td>
+            <textarea name="stages[{{ $index }}][teaching_activities]" class="form-control" rows="3" required></textarea>
+        </td>
+        <td>
+            <textarea name="stages[{{ $index }}][learning_activities]" class="form-control" rows="3" required></textarea>
+        </td>
+        <td>
+            <textarea name="stages[{{ $index }}][assessment]" class="form-control" rows="3" required></textarea>
+        </td>
+    </tr>
+    @endforeach
+</tbody>
+                    </table>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="submit"
+                            class="btn btn-success">
+
+                        Save Stages
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
 
 
 @empty
@@ -477,10 +809,52 @@
 </div>
 
 @endforelse
-
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Stage</th>
+            <th>Time (Minutes)</th>
+            <th>Teaching Activities</th>
+            <th>Learning Activities</th>
+            <th>Assessment</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if(isset($plan) && $plan->stages && $plan->stages->count() > 0)
+            @foreach($plan->stages as $stage)
+                <tr>
+                    <td>{{ $stage->stage_name }}</td>
+                    <td>{{ $stage->minutes }}</td>
+                    <td>
+                        {!! nl2br(e($stage->teaching_activities)) !!}
+                    </td>
+                    <td>
+                        {!! nl2br(e($stage->learning_activities)) !!}
+                    </td>
+                    <td>
+                        {!! nl2br(e($stage->assessment)) !!}
+                    </td>
+                </tr>
+            @endforeach
+        @else
+            <tr>
+                <td colspan="5" class="text-center text-muted py-3">
+                    Hakuna hatua (stages) zilizopatikana kwenye andalio hili.
+                </td>
+            </tr>
+        @endif
+    </tbody>
+</table>
+ @if(Auth::user()->role =="supervisor")
+    <a href="/showtl" class="btn btn-success text-white" style="text-decoration: none;">
+        Back
+    </a>
+    @endif
     </div>
 
 </div>
+
+
 
 <script>
 
@@ -578,6 +952,181 @@ function printLessonPlan(id){
 }
 
 </script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
 
+    let currentStep = 0;
+
+    const steps = document.querySelectorAll(".step");
+    const circles = document.querySelectorAll(".circle");
+
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const submitBtn = document.getElementById("submitBtn");
+
+    const progressBar =
+        document.getElementById("progressBar");
+
+    const stepText =
+        document.getElementById("stepText");
+
+    function showStep(step) {
+
+        steps.forEach((item, index) => {
+
+            item.classList.remove("active");
+
+            circles[index].classList.remove("active");
+
+            if(index <= step) {
+                circles[index].classList.add("active");
+            }
+
+        });
+
+        steps[step].classList.add("active");
+
+        stepText.innerHTML =
+            `Step ${step + 1} of ${steps.length}`;
+
+        let percent =
+            ((step + 1) / steps.length) * 100;
+
+        progressBar.style.width =
+            percent + "%";
+
+        prevBtn.style.display =
+            step === 0 ? "none" : "inline-block";
+
+        if(step === steps.length - 1){
+
+            nextBtn.style.display = "none";
+            submitBtn.style.display = "inline-block";
+
+        }else{
+
+            nextBtn.style.display = "inline-block";
+            submitBtn.style.display = "none";
+
+        }
+
+    }
+
+    nextBtn.addEventListener("click", function() {
+
+        if(currentStep < steps.length - 1){
+
+            currentStep++;
+
+            showStep(currentStep);
+
+        }
+
+    });
+
+    prevBtn.addEventListener("click", function() {
+
+        if(currentStep > 0){
+
+            currentStep--;
+
+            showStep(currentStep);
+
+        }
+
+    });
+
+    showStep(currentStep);
+
+});
+</script>
+<script>
+
+document.getElementById('subject_id')
+.addEventListener('change', function () {
+
+    let subjectId = this.value;
+
+    let topicSelect =
+        document.getElementById('topic_id');
+
+    let subTopicSelect =
+        document.getElementById('sub_topic_id');
+
+    topicSelect.innerHTML =
+        '<option value="">Loading...</option>';
+
+    subTopicSelect.innerHTML =
+        '<option value="">Select Sub Topic</option>';
+
+    fetch('/get-topics/' + subjectId)
+
+        .then(response => response.json())
+
+        .then(data => {
+
+            topicSelect.innerHTML =
+                '<option value="">Select Topic</option>';
+
+            data.forEach(topic => {
+
+                topicSelect.innerHTML += `
+                    <option value="${topic.id}">
+                        ${topic.topic_name}
+                    </option>
+                `;
+
+            });
+
+        });
+
+});
+
+document.getElementById('topic_id')
+.addEventListener('change', function () {
+
+    let topicId = this.value;
+
+    let subTopicSelect =
+        document.getElementById('sub_topic_id');
+
+    subTopicSelect.innerHTML =
+        '<option value="">Loading...</option>';
+
+    fetch('/get-subtopics/' + topicId)
+
+        .then(response => response.json())
+
+        .then(data => {
+
+            subTopicSelect.innerHTML =
+                '<option value="">Select Sub Topic</option>';
+
+            data.forEach(subTopic => {
+
+                subTopicSelect.innerHTML += `
+                    <option value="${subTopic.id}">
+                        ${subTopic.sub_topic_name}
+                    </option>
+                `;
+
+            });
+
+        });
+
+});
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@if(session('success'))
+<script>
+Swal.fire({
+    icon: 'success',
+    title: 'Success!',
+    text: '{{ session('success') }}',
+    confirmButtonText: 'OK'
+});
+</script>
+@endif
 {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> --}}
 @endsection

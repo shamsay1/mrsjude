@@ -13,7 +13,7 @@
      </style>
 </head>
 <body>
-    <table class="table table-bordered table-sm">
+   <table class="table table-bordered table-sm">
 
     <thead>
 
@@ -31,7 +31,7 @@
             <th colspan="3">TOPIC TEST (20)</th>
             <th rowspan="2">AVG</th>
 
-            <th rowspan="2">EXAM (50)</th>
+            <th rowspan="2">EXAM (60)</th>
             <th rowspan="2">TOTAL (100)</th>
             <th rowspan="2">GRADE</th>
             <th rowspan="2">POSITION</th>
@@ -40,26 +40,17 @@
 
         <tr>
 
-            <th>1</th>
-            <th>2</th>
-            <th>3</th>
-            <th>4</th>
-            <th>5</th>
-            <th>6</th>
-            <th>7</th>
-            <th>8</th>
-            <th>9</th>
-            <th>10</th>
+            @for($i = 1; $i <= 10; $i++)
+                <th>{{ $i }}</th>
+            @endfor
 
-            <th>1</th>
-            <th>2</th>
-            <th>3</th>
-            <th>4</th>
-            <th>5</th>
+            @for($i = 1; $i <= 5; $i++)
+                <th>{{ $i }}</th>
+            @endfor
 
-            <th>1</th>
-            <th>2</th>
-            <th>3</th>
+            @for($i = 1; $i <= 3; $i++)
+                <th>{{ $i }}</th>
+            @endfor
 
         </tr>
 
@@ -71,8 +62,8 @@
 
             @php
 
-                $cwAverage =
-                (
+                // CLASSWORK (100 -> 10)
+                $cwTotal =
                     ($record->classwork1 ?? 0) +
                     ($record->classwork2 ?? 0) +
                     ($record->classwork3 ?? 0) +
@@ -82,44 +73,48 @@
                     ($record->classwork7 ?? 0) +
                     ($record->classwork8 ?? 0) +
                     ($record->classwork9 ?? 0) +
-                    ($record->classwork10 ?? 0)
-                ) / 10;
+                    ($record->classwork10 ?? 0);
 
-                $hwAverage =
-                (
+                $cwAverage = $cwTotal / 10;
+
+                // HOMEWORK (50 -> 10)
+                $hwTotal =
                     ($record->homework1 ?? 0) +
                     ($record->homework2 ?? 0) +
                     ($record->homework3 ?? 0) +
                     ($record->homework4 ?? 0) +
-                    ($record->homework5 ?? 0)
-                ) / 5;
+                    ($record->homework5 ?? 0);
 
-                $ttAverage =
-                (
+                $hwAverage = $hwTotal / 5;
+
+                // TOPIC TEST (30 -> 20)
+                $ttTotal =
                     ($record->topictest1 ?? 0) +
                     ($record->topictest2 ?? 0) +
-                    ($record->topictest3 ?? 0)
-                ) / 3;
+                    ($record->topictest3 ?? 0);
 
+                $ttAverage = ($ttTotal / 30) * 20;
+
+                // EXAM (60)
+                $exam = $record->terminal_exam ?? 0;
+
+                // TOTAL (100)
                 $total =
                     $cwAverage +
                     $hwAverage +
                     $ttAverage +
-                    ($record->terminal_exam ?? 0);
+                    $exam;
 
-                if($total >= 81){
+                // GRADE
+                if ($total >= 81) {
                     $grade = 'A';
-                }
-                elseif($total >= 61){
+                } elseif ($total >= 61) {
                     $grade = 'B';
-                }
-                elseif($total >= 41){
+                } elseif ($total >= 41) {
                     $grade = 'C';
-                }
-                elseif($total >= 21){
+                } elseif ($total >= 21) {
                     $grade = 'D';
-                }
-                else{
+                } else {
                     $grade = 'F';
                 }
 
@@ -146,7 +141,7 @@
                 <td>{{ $record->classwork9 }}</td>
                 <td>{{ $record->classwork10 }}</td>
 
-                <td>{{ number_format($cwAverage,1) }}</td>
+                <td>{{ number_format($cwAverage, 1) }}</td>
 
                 <td>{{ $record->homework1 }}</td>
                 <td>{{ $record->homework2 }}</td>
@@ -154,23 +149,27 @@
                 <td>{{ $record->homework4 }}</td>
                 <td>{{ $record->homework5 }}</td>
 
-                <td>{{ number_format($hwAverage,1) }}</td>
+                <td>{{ number_format($hwAverage, 1) }}</td>
 
                 <td>{{ $record->topictest1 }}</td>
                 <td>{{ $record->topictest2 }}</td>
                 <td>{{ $record->topictest3 }}</td>
 
-                <td>{{ number_format($ttAverage,1) }}</td>
+                <td>{{ number_format($ttAverage, 1) }}</td>
 
-                <td>{{ $record->terminal_exam }}</td>
-
-                <td>{{ number_format($total,1) }}</td>
-
-                <td>{{ $grade }}</td>
+                <td>{{ $exam }}</td>
 
                 <td>
-                    --
+                    <strong>{{ number_format($total, 1) }}</strong>
                 </td>
+
+                <td>
+                    <span class="badge bg-primary">
+                        {{ $grade }}
+                    </span>
+                </td>
+
+                <td>--</td>
 
             </tr>
 
@@ -179,5 +178,16 @@
     </tbody>
 
 </table>
+<button style="background-color: green;border: none;color: white;padding: 10px;border-radius: 3px">
+     @if(Auth::user()->role =="teacher")
+    <a href="/assessment" class="btn btn-success text-white" style="text-decoration: none;">
+        Back
+    </a>
+    @else
+    <a href="/showtl" class="btn btn-success text-white" style="text-decoration: none;">
+        Back
+    </a>
+    @endif
+</button>
 </body>
 </html>

@@ -6,6 +6,7 @@ use App\Models\ClassRoom;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 
 class StudentController extends Controller
 {
@@ -38,6 +39,7 @@ class StudentController extends Controller
             'lastname' => $request->lastname,
             'gender' => $request->gender,
             'class_id' => $request->class_id,
+            'school_id' => Auth::user()->school_id,
         ]);
 
         return redirect()->back()

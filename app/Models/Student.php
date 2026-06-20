@@ -11,7 +11,8 @@ class Student extends Model
         "middlename",
         "lastname",
         "gender",
-        "class_id"
+        "class_id",
+        "school_id"
     ];
     public function classRoom()
 {
@@ -22,4 +23,8 @@ class Student extends Model
 {
     return $this->hasMany(Assessment::class);
 }
+   public function School(){
+    return $this->belongsTo(School::class,"school_id");
+
+   }
 }

@@ -7,6 +7,7 @@
     <div class="table-container">
 
         <!-- Add Subject Button -->
+        @if(Auth::user()->role !="teacher")
         <button class="btn btn-primary mb-3"
             data-bs-toggle="modal"
             data-bs-target="#addSubjectModal">
@@ -14,6 +15,7 @@
             + Add Subject
 
         </button>
+        @endif
 
         <!-- Add Modal -->
         <div class="modal fade" id="addSubjectModal" tabindex="-1">
@@ -171,7 +173,7 @@
                             <th>Subject Name</th>
                             <th>Subject Code</th>
                             <th>Teacher</th>
-                            <th>Action</th>
+                            {{-- <th>Action</th> --}}
                         </tr>
                     </thead>
 
@@ -186,7 +188,7 @@
                                     {{ $subject->teacher->lastname ?? '' }}
                                 </td>
 
-                                <td>
+                                {{-- <td>
                                     <!-- Edit -->
                                     <button class="btn btn-sm btn-primary"
                                         data-bs-toggle="modal"
@@ -205,7 +207,7 @@
                                             Delete
                                         </button>
                                     </form>
-                                </td>
+                                </td> --}}
                             </tr>
                         @endforeach
                     </tbody>

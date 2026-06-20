@@ -1,13 +1,62 @@
 @extends("layout.app")
+<style>
+    .flash-message {
+    background-color: #d1e7dd; /* Light green background */
+    border-color: #badbcc; /* Darker green border */
+    color: #0f5132; /* Dark green text */
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.5s ease-in-out;
+}
 
+.flash-message .alert-heading {
+    color: #0f5132;
+    font-weight: bold;
+}
+
+.flash-message .btn-close {
+    color: #0f5132;
+    opacity: 0.8;
+}
+
+.flash-message .bi-check-circle-fill {
+    font-size: 1.5rem;
+    color: #28a745; 
+}
+</style>
 @section("content")
 
 <div class="content" id="content">
+<div class="col-md-12">
+                <div class="alert alert-dismissible fade show flash-message mt-1"
+                     role="alert"
+                     style="background-color:white;">
 
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+
+                        <div class="flex-grow-1">
+                            <h6 class="alert-heading mb-1">Teachers Workbooks Information</h6>
+
+                            <p class="mb-0 text-success">
+                                School Name: {{ $school->school_name ?? 'N/A' }}
+                            </p>
+                        </div>
+
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="alert"
+                                aria-label="Close">
+                        </button>
+                    </div>
+
+                </div>
+            </div>
     <div class="table-container">
 
         <!-- Table -->
         {{-- <h2 style="color: green;text-align: center;font-family: 'Times New Roman', Times, serif">All Teachers from {{ $school->school_name }}</h2> --}}
+        
         <table class="table table-sm table-hover">
 
     <thead class="bg-secondary text-white">

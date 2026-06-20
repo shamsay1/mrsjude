@@ -28,96 +28,186 @@
 
 <div class="content" id="content">
 
-    <!-- Cards -->
+    <!-- Summary Cards -->
     <div class="five-cols">
 
+        @if(Auth::user()->role == "admin")
 
+            <div class="card-custom">
+                <div class="card-title">Total Schools</div>
+                <div class="card-value">{{ $total_school }}</div>
+            </div>
+
+            <div class="card-custom">
+                <div class="card-title">District Officers</div>
+                <div class="card-value">{{ $total_district }}</div>
+            </div>
+
+            <div class="card-custom">
+                <div class="card-title">Total Teachers</div>
+                <div class="card-value">{{ $total_teachers }}</div>
+            </div>
+
+            <div class="card-custom">
+                <div class="card-title">Head Masters</div>
+                <div class="card-value">{{ $total_headmaster }}</div>
+            </div>
+
+        @elseif(Auth::user()->role == "d_officer")
+
+            <div class="card-custom">
+                <div class="card-title">Total Schools</div>
+                <div class="card-value">{{ $total_school }}</div>
+            </div>
+
+            <div class="card-custom">
+                <div class="card-title">Total Teachers</div>
+                <div class="card-value">{{ $total_teachers }}</div>
+            </div>
+
+        @else
+
+            <div class="card-custom">
+                <div class="card-title">Total Teachers</div>
+                <div class="card-value">{{ $total_school_teachers }}</div>
+            </div>
+
+            <div class="card-custom">
+                <div class="card-title">Total Students</div>
+                <div class="card-value">{{ $total_school_students }}</div>
+            </div>
+
+            <div class="card-custom">
+                <div class="card-title">Total Classess</div>
+                <div class="card-value">{{ $total_school_class }}</div>
+            </div>
+
+        @endif
+
+    </div>
+
+    <!-- Charts / Welcome Section -->
+    <div class="row mt-4">
 
         @if(Auth::user()->role == "admin")
-        <div class="card-custom">
-            <div class="card-title">Total Schools</div>
-            <div class="card-value">{{ $total_school }}</div>
-        </div>
 
-        <div class="card-custom">
-            <div class="card-title">District Officers</div>
-            <div class="card-value">{{ $total_district }}</div>
-        </div>
+            <div class="col-md-8">
+                <div class="table-container">
+                    <div style="width:100%; max-width:900px; margin:auto;">
+                        <canvas id="schoolChart"></canvas>
+                    </div>
+                </div>
+            </div>
 
-        <div class="card-custom">
-            <div class="card-title">Total Teachers</div>
-            <div class="card-value">{{ $total_teachers }}</div>
-        </div>
-        
-     
-        <div class="card-custom">
-            <div class="card-title">Head masters</div>
-            <div class="card-value">{{ $total_headmaster }}</div>
-        </div>
-        @elseif(Auth::user()->role == "d_officer")
-        <div class="card-custom">
-            <div class="card-title">Total Schools</div>
-            <div class="card-value">{{ $total_school }}</div>
-        </div>
+            <div class="col-md-4">
+                <div class="table-container">
+                    <h3 style="font-family:'Times New Roman', Times, serif; font-size:14px; text-align:center;">
+                        SCHOOL PER DISTRICT
+                    </h3>
 
-        <div class="card-custom">
-            <div class="card-title">Total Teachers</div>
-            <div class="card-value">{{ $total_teachers }}</div>
-        </div>
+                    <canvas id="districtPieChart"></canvas>
+                </div>
+            </div>
+
+        @else
+
+            <div class="col-md-12">
+                <div class="alert alert-dismissible fade show flash-message mt-1"
+                     role="alert"
+                     style="background-color:white;">
+
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+
+                        <div class="flex-grow-1">
+                            <h6 class="alert-heading mb-1">Staff Information</h6>
+
+                            <p class="mb-0 text-success">
+                                Welcome Mr/Mrs:
+                                {{ Auth::user()->firstname }}
+                                {{ Auth::user()->middlename }}
+                                {{ Auth::user()->lastname }}
+                            </p>
+                        </div>
+
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="alert"
+                                aria-label="Close">
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
         @endif
-        
-       
-
-        
 
     </div>
 
-    <!-- Table -->
-    
-   <div>
-    
-    <div class="row">
-
-    @if(Auth::user()->role == "admin")
-    <div class="col-md-8">
-        <div class="table-container">
-            <div style="width:100%; max-width:900px; margin:auto;">
-    <canvas id="schoolChart"></canvas>
-</div>
-        </div>
-    </div>
-
-   
-    <div class="col-md-4">
-        <div class="table-container">
-            <h3 style="font-family: 'Times New Roman', Times, serif;font-size: 14px;text-align: center">SCHOOL PER DISTRICT</h3>
-            
-            <canvas id="districtPieChart"></canvas>
-        
-        </div>
-    </div>
-    @else
-    <div class="col-md-12 p-3">
-    <div class="alert alert-dismissible fade show flash-message mt-3" role="alert" style="background-color: white">
-  <div class="d-flex align-items-center">
-    <i class="bi bi-check-circle-fill me-2"></i> <div class="flex-grow-1">
-      <h6 class="alert-heading mb-1">Staff Information</h6>
-      <p class="mb-0" style="color: green">Welcome Mr/Mrs: {{ Auth::user()->firstname }} {{ Auth::user()->middlename }} {{ Auth::user()->lastname }}</p>
-    </div>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div>
-  </div>
-</div>
-    @endif
-
-</div>
-<div class="row mt-4">
+    <!-- Line Chart -->
+    <div class="row mt-1">
     <div class="col-md-12">
-        <div class="table-container" style="height: 600px;width: 100%">
-            <canvas id="paymentsLineChart" style="width: 100%"></canvas>
+        <div class="table-container p-3">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">
+                    <i class="fa fa-users me-2"></i>
+                    Recent Users
+                </h5>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered align-middle">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Phone</th>
+                            <th>Date Joined</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @forelse($recentUsers as $key => $user)
+                            <tr>
+                                <td>{{ $key + 1 }}</td>
+
+                                <td>
+                                    {{ $user->firstname }}
+                                    {{ $user->middlename }}
+                                    {{ $user->lastname }}
+                                </td>
+
+                                <td>{{ $user->email }}</td>
+
+                                <td>
+                                    <span class="badge bg-primary">
+                                        {{ ucfirst($user->role) }}
+                                    </span>
+                                </td>
+
+                                <td>{{ $user->mobile ?? 'N/A' }}</td>
+
+                                <td>
+                                    {{ $user->created_at->format('d M Y') }}
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">
+                                    No recent users found.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+
+                </table>
+            </div>
+
         </div>
     </div>
-</div>
 </div>
 
 </div>

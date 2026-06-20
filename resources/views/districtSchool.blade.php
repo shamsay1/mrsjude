@@ -31,7 +31,7 @@
                             </h6>
 
                             <small style="color: blue;">
-                                Click to view teachers
+                                Click to view report
                             </small>
 
                         </div>

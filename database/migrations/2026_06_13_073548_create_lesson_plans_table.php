@@ -18,9 +18,13 @@ return new class extends Migration
         ->constrained('subjects')
         ->onDelete('cascade');
 
-    $table->string('topic');
+    $table->foreignId('topic_id')
+      ->constrained('topics')
+      ->cascadeOnDelete();
 
-    $table->string('subtopic');
+$table->foreignId('sub_topic_id')
+      ->constrained('sub_topics')
+      ->cascadeOnDelete();
 
     $table->text('objectives');
 

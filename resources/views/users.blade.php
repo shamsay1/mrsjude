@@ -120,7 +120,7 @@
                             </div>
 
                             <div class="row">
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-6 mb-3">
 
                                     <label>Role</label>
 
@@ -131,7 +131,7 @@
     <option value="">Select Role</option>
         @if (Auth::user()->role == "admin")
 
-    <option value="d_officer">District Officer</option>
+    <option value="supervisor">Supervisor</option>
     <option value="headmaster">Head Master</option>
      @else
     <option value="teacher">Teacher</option>
@@ -140,32 +140,9 @@
 </select>
 
                                 </div>
-                                @if (Auth::user()->role=="admin")
-                                    
-                                
-                                <div class="col-md-4 mb-3">
+                            
 
-                                    <label>District</label>
-
-                                    <select name="district_id"
-                                        class="form-control">
-
-                                        <option value="">Select District</option>
-
-                                        @foreach ($districts as $district)
-
-                                            <option value="{{ $district->id }}">
-                                                {{ $district->district_name }}
-                                            </option>
-
-                                        @endforeach
-
-                                    </select>
-
-                                </div>
-                                @endif
-
-                                <div class="col-md-4 mb-3" id="schoolField" style="display:none;">
+                                <div class="col-md-6 mb-3" id="schoolField" style="display:none;">
 
     <label>School</label>
 
@@ -233,10 +210,10 @@
                     Headmaster
 
                 </option>
-                <option value="d_officer"
-                    {{ request('role') == 'd_officer' ? 'selected' : '' }}>
+                <option value="supervisor"
+                    {{ request('role') == 'supervisor' ? 'selected' : '' }}>
 
-                    Distric Officer
+                    Supervisor
 
                 </option>
 
@@ -327,7 +304,6 @@
                     <th>Full Name</th>
                     <th>Email</th>
                     <th>Gender</th>
-                    <th>District</th>
                     <th>School</th>
                     <th>Status</th>
                     <th>Role</th>
@@ -355,8 +331,6 @@
 
                         <td>{{ $user->gender }}</td>
 
-                        <td>{{ $user->district->district_name ?? 'N/A' }}</td>
-
                         <td>{{ $user->school->school_name ?? 'N/A' }}</td>
                         <td>
                             @if($user->status == 'Active')
@@ -381,6 +355,81 @@
                                 <i class="bi bi-pencil-square"></i>
 
                             </button>
+                            @if($user->role == 'supervisor')
+
+<button class="btn btn-sm btn-warning"
+        data-bs-toggle="modal"
+        data-bs-target="#assignOrderModal{{ $user->id }}">
+    <i class="bi bi-clipboard-check"></i>
+</button>
+
+<!-- Assign Order Modal -->
+<div class="modal fade" id="assignOrderModal{{ $user->id }}">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header bg-warning text-dark">
+                <h5>Assign Inspection Order</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form action="{{ route('orders.store') }}" method="POST">
+                @csrf
+
+                <div class="modal-body">
+
+                    <input type="hidden"
+                           name="supervisor_id"
+                           value="{{ $user->id }}">
+
+                    <div class="mb-3">
+                        <label>School</label>
+                        <select name="school_id"
+                                class="form-control"
+                                required>
+
+                            <option value="">Select School</option>
+
+                            @foreach($schools as $school)
+                                <option value="{{ $school->id }}">
+                                    {{ $school->school_name }}
+                                </option>
+                            @endforeach
+
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Inspection Date</label>
+                        <input type="date"
+                               name="inspection_date"
+                               class="form-control"
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Instruction</label>
+                        <textarea name="instruction"
+                                  rows="4"
+                                  class="form-control"
+                                  required></textarea>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-warning">
+                        Assign Order
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@endif
 
                             <!-- Delete -->
                             <form action="{{ route('system-user.toggle-status', $user->id) }}"
@@ -586,7 +635,7 @@
                 @empty
 
                     <tr>
-                        <td colspan="7" style="text-align: center">No Record Found</td>
+                        <td colspan="100%" style="text-align: center">No Record Found</td>
                     </tr>
 
                 @endforelse

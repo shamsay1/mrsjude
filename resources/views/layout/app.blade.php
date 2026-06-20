@@ -232,24 +232,65 @@ body {
 </a>
 
 <a href="{{ route('schoold') }}" class="{{ request()->routeIs('schoold') ? 'active' : '' }}">
-    <i class="bi bi-diagram-3-fill"></i> <span>School District</span>
+    <i class="bi bi-diagram-3-fill"></i> <span>Workbooks</span>
 </a>
 
-<a href="" class="">
-    <i class="bi bi-file-earmark-bar-graph"></i> <span>Report</span>
+<a href="{{ route('vwork') }}" class="">
+    <i class="bi bi-file-earmark-bar-graph"></i> <span>View works</span>
 </a>
+<div class="nav-item dropdown">
+    <a href="#" 
+       class="nav-link dropdown-toggle {{ request()->routeIs('adminsupervisors.reports') || request()->routeIs('adminsil') ? 'active' : '' }}" 
+       id="reportsDropdown" 
+       role="button" 
+       data-bs-toggle="dropdown" 
+       aria-expanded="false">
+        <i class="bi bi-file-earmark-bar-graph"></i> <span>Reports</span>
+    </a>
+    
+    <ul class="dropdown-menu" aria-labelledby="reportsDropdown" style="background: black">
+        <li>
+            <a href="{{ route('adminsupervisors.reports') }}" class="dropdown-item {{ request()->routeIs('adminsupervisors.reports') ? 'active' : '' }}">
+                <i class="bi bi-graph-up-arrow me-2"></i> Performance
+            </a>
+        </li>
+        
+        <li>
+            <a href="{{ route('adminsil') }}" class="dropdown-item {{ request()->routeIs('adminsil') ? 'active' : '' }}">
+                <i class="bi bi-book me-2"></i> Syllabus
+            </a>
+        </li>
+    </ul>
+</div>
+
 
 <a href="{{ route('profile') }}" class="{{ request()->routeIs('profile') ? 'active' : '' }}">
     <i class="bi bi-person-circle"></i> <span>Profile</span>
 </a>
-@elseif(Auth::user()->role =="d_officer")
+@elseif(Auth::user()->role =="supervisor")
 <a href="/dashboard" class="{{ request()->is('dashboard') ? 'active' : '' }}">
     <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
 </a>
-<a href="{{ route('system-user.index') }}" class="{{ request()->routeIs('system-user.*') ? 'active' : '' }}">
+<a href="{{ route('orders.index') }}"
+   class="{{ request()->is('orders.index') ? 'active' : '' }}">
+
+    <i class="bi bi-clipboard-check"></i>
+
+    View Orders
+
+    <span class="badge bg-danger">
+        {{ $totalOrders ?? 0 }}
+    </span>
+
+</a>
+<a href="{{ route('showtl') }}" class="{{ request()->routeIs('showtl') ? 'active' : '' }}">
     <i class="bi bi-person-gear"></i> <span>View Teachers</span>
 </a>
-<a href="" class="">
+<a href="{{ route('adminsil') }}" class="{{ request()->routeIs('showtl') ? 'active' : '' }}">
+    <i class="bi bi-person-gear"></i> <span>View report</span>
+</a>
+
+<a href="{{ route('supervisor.student.performance.report') }}" class="">
     <i class="bi bi-file-earmark-bar-graph"></i> <span>Send Report</span>
 </a>
 @elseif(Auth::user()->role =="headmaster")
@@ -264,16 +305,15 @@ body {
     <i class="bi bi-person-lines-fill"></i>
     <span>View Teachers</span>
 </a>
-<a href="{{ route('student.index') }}"
-   class="{{ request()->routeIs('system-user.*') ? 'active' : '' }}">
-    <i class="bi bi-people"></i>
-    <span>Student info</span>
-</a>
-
 <a href="{{ route('school-class.index') }}"
    class="{{ request()->routeIs('school-class.*') ? 'active' : '' }}">
     <i class="bi bi-door-open-fill"></i>
     <span>Class Rooms</span>
+</a>
+<a href="{{ route('student.index') }}"
+   class="{{ request()->routeIs('student.index') ? 'active' : '' }}">
+    <i class="bi bi-people"></i>
+    <span>Student info</span>
 </a>
 
 <a href="{{ route('subject.index') }}"

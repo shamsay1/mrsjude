@@ -5,7 +5,9 @@ use App\Http\Controllers\ClassRoomController;
 use App\Http\Controllers\DailyRecordController;
 use App\Http\Controllers\DistrictController;
 use App\Http\Controllers\LessonPlanController;
+use App\Http\Controllers\LessonPlanStageController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SchoolController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubjectController;
@@ -71,6 +73,7 @@ Route::get(
 )->name('teacher.assessment.book');
 
 use App\Http\Controllers\SchemeOfWorkController;
+use App\Http\Controllers\SupervisorController;
 
 Route::get('/schemes', [SchemeOfWorkController::class, 'index'])->name('scheme.index');
 Route::post('/schemes', [SchemeOfWorkController::class, 'store'])->name('scheme.store');
@@ -87,3 +90,35 @@ Route::patch('/school/{id}/toggle-status',
 Route::patch('/system-user/{id}/toggle-status',
     [UserController::class, 'toggleStatus'])
     ->name('system-user.toggle-status');
+Route::post('/orders/store',
+    [OrderController::class,'store'])
+    ->name('orders.store');
+Route::get('/orders',
+    [OrderController::class,'index'])
+    ->name('orders.index');
+Route::get('/orders/{id}',
+    [OrderController::class,'show'])
+    ->name('orders.show');
+
+Route::patch('/orders/{id}/complete',
+    [OrderController::class,'complete'])
+    ->name('orders.complete');
+Route::get('/get-topics/{subjectId}',
+    [LessonPlanController::class, 'getTopics']);
+
+Route::get('/get-subtopics/{topicId}',
+    [LessonPlanController::class, 'getSubTopics']);
+Route::get("/view_work",[OrderController::class,"index1"])->name("vwork");
+Route::patch('/orders/{id}/toggle-status', [OrderController::class, 'toggleStatus'])->name('orders.toggle-status');
+Route::post(
+    '/lesson-plan-stage/store',
+    [LessonPlanStageController::class,'store']
+)->name('lesson-plan-stage.store');
+Route::get('/supervisor/student-performance-report', [SupervisorController::class, 'studentPerformanceReport'])
+    ->name('supervisor.student.performance.report');
+Route::post('/report/send',
+    [SupervisorController::class,'sendReport'])
+    ->name('report.send');
+Route::get('/admin/syllabus-report', [SupervisorController::class, 'adminSyllabusReport'])->name("adminsil");
+// Route ya kuona ripoti za wasimamizi (Supervisors)
+Route::get('/admin/supervisor-reports', [SupervisorController::class, 'adminSupervisorReports'])->name("adminsupervisors.reports");
