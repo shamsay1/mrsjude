@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\ClassRoom;
 use App\Models\Subject;
+use App\Models\SubTopic;
 use App\Models\SystemUser;
+use App\Models\Topic;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Exception;
+use Illuminate\Support\Facades\DB;
 
 class SubjectController extends Controller
 {
@@ -38,23 +41,59 @@ class SubjectController extends Controller
     try {
 
         $request->validate([
-            'subjectName' => 'required',
-            'subjectCode' => 'required',
+            'subjectName'   => 'required',
+            'subjectCode'   => 'required',
             'class_room_id' => 'required',
-            'teacher_id' => 'required'
+            'teacher_id'    => 'required'
         ]);
 
-        Subject::create([
-            'subjectName' => $request->subjectName,
-            'subjectCode' => $request->subjectCode,
+        DB::beginTransaction();
+
+        // Save Subject
+        $subject = Subject::create([
+            'subjectName'   => $request->subjectName,
+            'subjectCode'   => $request->subjectCode,
             'class_room_id' => $request->class_room_id,
-            'teacher_id' => $request->teacher_id
+            'teacher_id'    => $request->teacher_id
         ]);
+
+        $notes = require storage_path('app/notes.php');
+
+       
+        $subjectName = strtoupper(trim($subject->subjectName));
+        $className = $subject->classRoom->class_name;
+
+        // Angalia kama syllabus ipo
+        if (isset($notes[$subjectName]) && isset($notes[$subjectName][$className])) {
+
+            foreach ($notes[$subjectName][$className] as $topicName => $subTopics) {
+
+                $topic = Topic::create([
+                    'subject_id' => $subject->id,
+                    'topic_name' => $topicName
+                ]);
+
+                foreach ($subTopics as $subTopicName) {
+
+                    SubTopic::create([
+                        'topic_id' => $topic->id,
+                        'sub_topic_name' => $subTopicName
+                    ]);
+
+                }
+
+            }
+
+        }
+
+        DB::commit();
 
         return redirect()->back()
             ->with('success', 'Subject added successfully');
 
     } catch (Exception $e) {
+
+        DB::rollBack();
 
         return redirect()->back()
             ->withInput()
@@ -74,7 +113,7 @@ class SubjectController extends Controller
         $subject = Subject::findOrFail($id);
 
         $subject->update([
-            'subjectName' => $request->subjectName,
+            'subjectName' => strtoupper($request->subjectName),
             'subjectCode' => $request->subjectCode,
             'class_room_id' => $request->class_room_id,
             'teacher_id' => $request->teacher_id

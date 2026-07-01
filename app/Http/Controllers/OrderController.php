@@ -9,6 +9,7 @@ use App\Models\SystemUser;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller
 {
@@ -18,7 +19,7 @@ class OrderController extends Controller
         'school',
         'supervisor'
     ])
-    ->where('supervisor_id', Auth::id())
+    ->where('supervisor_id', Auth::user()->id)
     ->latest()
     ->get();
 
@@ -30,26 +31,42 @@ class OrderController extends Controller
     ));
 }
     public function store(Request $request)
-    {
-        $request->validate([
-            'supervisor_id' => 'required|exists:system_users,id',
-            'school_id' => 'required|exists:schools,id',
-            'instruction' => 'required',
-            'inspection_date' => 'required|date',
-        ]);
+{
+    $request->validate([
+        'supervisor_id' => 'required|exists:system_users,id',
+        'school_id' => 'required|exists:schools,id',
+        'instruction' => 'required',
+        'inspection_date' => 'required|date',
+    ]);
 
-        Order::create([
-            'supervisor_id' => $request->supervisor_id,
-            'school_id' => $request->school_id,
-            'instruction' => $request->instruction,
-            'inspection_date' => $request->inspection_date,
-            'status' => 'pending',
-        ]);
+    
+    $order = Order::create([
+        'supervisor_id' => $request->supervisor_id,
+        'school_id' => $request->school_id,
+        'instruction' => $request->instruction,
+        'inspection_date' => $request->inspection_date,
+        'status' => 'pending',
+    ]);
+    $supervisor = SystemUser::find($request->supervisor_id);
+    if ($supervisor && $supervisor->email) {
+        
+        $tarehe = date('d M Y', strtotime($request->inspection_date));
+        
+        $ujumbe = "Habari, umepangiwa majukumu mapya ya ukaguzi (Inspection Order) kwenye mfumo wetu.\n\n"
+                . "Tarehe ya Ukaguzi: " . $tarehe . "\n"
+                . "Maelekezo: " . $request->instruction . "\n\n"
+                . "Tafadhali ingia kwenye mfumo (Dashboard) wako kuona maelezo zaidi.";
 
-        return redirect()
-            ->back()
-            ->with('success', 'Order assigned successfully.');
+        Mail::raw($ujumbe, function ($message) use ($supervisor) {
+            $message->to($supervisor->email)
+                    ->subject('New Inspection Order Assigned');
+        });
     }
+
+    return redirect()
+        ->back()
+        ->with('success', 'Order assigned successfully.');
+}
     public function show($id)
 {
     $order = Order::with([

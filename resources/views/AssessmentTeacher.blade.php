@@ -3,7 +3,11 @@
 @section("content")
 
 <div class="content" id="content">
-
+    @if(Auth::user()->role =="supervisor" || Auth::user()->role =="headmaster")
+    <a href="/showtl" class="btn btn-success text-white mb-2" style="text-decoration: none;">
+        Back
+    </a>
+    @endif
     <div class="table-container">
 
         <table class="table table-bordered">

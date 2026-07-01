@@ -82,7 +82,7 @@
 <div class="login-card">
     
     <h4 class="login-title text-center">
-        Digital Teachers workbooks and Supervision Management System
+        DTWSMS
         
     </h4>
 

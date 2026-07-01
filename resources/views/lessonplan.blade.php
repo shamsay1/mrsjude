@@ -667,11 +667,88 @@ document.getElementById('topic_id')
                 {!! nl2br(e($plan->references ?? '')) !!}
             </div>
 
+            <div class="section-title">
+                Status:
+            </div>
+
+            <div class="content-box">
+                @if($plan->status == "completed")
+                <span class="badge bg-success">Already reviewed</span>
+                @else
+                <span class="bagde bg-danger">{{$plan->status}}</span>
+
+                @endif
+            </div>
+
         </div>
 
         <!-- BUTTONS -->
 
         <div class="mt-4 no-print">
+            @if(Auth::user()->role == "headmaster")
+            <button
+    type="button"
+    class="btn btn-primary approveBtn mb-3"
+    data-bs-toggle="modal"
+    data-bs-target="#approveModal"
+    data-id="{{ $plan->id }}">
+    Approve
+</button>
+<div class="modal fade" id="approveModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form action="{{ route('plans.approve') }}" method="POST">
+                @csrf
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Approve Plan</h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <input type="hidden" name="plan_id" id="plan_id">
+
+                    <p>Are you sure you want to approve this plan?</p>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Approve
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+<script>
+document.querySelectorAll('.approveBtn').forEach(button => {
+
+    button.addEventListener('click', function () {
+
+        document.getElementById('plan_id').value = this.dataset.id;
+
+    });
+
+});
+</script>
+   @else
             <button class="btn btn-success"
         data-bs-toggle="modal"
         data-bs-target="#stageModal{{ $plan->id }}">
@@ -713,6 +790,8 @@ document.getElementById('topic_id')
         </div>
 
     </div>
+
+    @endif
 
     <div class="modal fade" id="stageModal{{ $plan->id }}">
     <div class="modal-dialog modal-xl">
@@ -765,7 +844,11 @@ document.getElementById('topic_id')
             <input type="hidden" name="stages[{{ $index }}][stage_name]" value="{{ $stage }}">
         </td>
         <td>
-            <input type="number" name="stages[{{ $index }}][minutes]" class="form-control" required>
+            <input type="number"
+       name="stages[{{ $index }}][minutes]"
+       class="form-control minutes"
+       min="0"
+       required>
         </td>
         <td>
             <textarea name="stages[{{ $index }}][teaching_activities]" class="form-control" rows="3" required></textarea>
@@ -845,7 +928,7 @@ document.getElementById('topic_id')
         @endif
     </tbody>
 </table>
- @if(Auth::user()->role =="supervisor")
+ @if(Auth::user()->role =="supervisor" || Auth::user()->role =="headmaster")
     <a href="/showtl" class="btn btn-success text-white" style="text-decoration: none;">
         Back
     </a>
@@ -854,7 +937,35 @@ document.getElementById('topic_id')
 
 </div>
 
+<script>
+document.addEventListener("DOMContentLoaded", function () {
 
+    const minuteInputs = document.querySelectorAll(".minutes");
+
+    minuteInputs.forEach(input => {
+
+        input.addEventListener("input", function () {
+
+            let total = 0;
+
+            minuteInputs.forEach(item => {
+                total += parseInt(item.value) || 0;
+            });
+
+            if (total > 80) {
+
+                alert("Total minutes cannot exceed 80.");
+
+                this.value = "";
+
+            }
+
+        });
+
+    });
+
+});
+</script>
 
 <script>
 

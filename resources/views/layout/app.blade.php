@@ -206,7 +206,7 @@ body {
 
         Teacher
         @else
-        D.Officer
+        Supervisor
         @endif
     </div>
 
@@ -231,9 +231,9 @@ body {
     <i class="bi bi-person-gear"></i> <span>Manage Users</span>
 </a>
 
-<a href="{{ route('schoold') }}" class="{{ request()->routeIs('schoold') ? 'active' : '' }}">
+{{-- <a href="{{ route('schoold') }}" class="{{ request()->routeIs('schoold') ? 'active' : '' }}">
     <i class="bi bi-diagram-3-fill"></i> <span>Workbooks</span>
-</a>
+</a> --}}
 
 <a href="{{ route('vwork') }}" class="">
     <i class="bi bi-file-earmark-bar-graph"></i> <span>View works</span>
@@ -251,13 +251,20 @@ body {
     <ul class="dropdown-menu" aria-labelledby="reportsDropdown" style="background: black">
         <li>
             <a href="{{ route('adminsupervisors.reports') }}" class="dropdown-item {{ request()->routeIs('adminsupervisors.reports') ? 'active' : '' }}">
-                <i class="bi bi-graph-up-arrow me-2"></i> Performance
+                <i class="bi bi-graph-up-arrow me-2"></i> School Performance
             </a>
         </li>
+
+        
         
         <li>
             <a href="{{ route('adminsil') }}" class="dropdown-item {{ request()->routeIs('adminsil') ? 'active' : '' }}">
                 <i class="bi bi-book me-2"></i> Syllabus
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('performance') }}" class="dropdown-item {{ request()->routeIs('adminsupervisors.reports') ? 'active' : '' }}">
+                <i class="bi bi-graph-up-arrow me-2"></i> Teacher Performance
             </a>
         </li>
     </ul>
@@ -278,9 +285,9 @@ body {
 
     View Orders
 
-    <span class="badge bg-danger">
+    {{-- <span class="badge bg-danger">
         {{ $totalOrders ?? 0 }}
-    </span>
+    </span> --}}
 
 </a>
 <a href="{{ route('showtl') }}" class="{{ request()->routeIs('showtl') ? 'active' : '' }}">

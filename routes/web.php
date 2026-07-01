@@ -8,37 +8,81 @@ use App\Http\Controllers\LessonPlanController;
 use App\Http\Controllers\LessonPlanStageController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\SchemeOfWorkController;
 use App\Http\Controllers\SchoolController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\SupervisorController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get("/",[LoginController::class,"showlogin"])->name('login');
-Route::get("/dashboard",[UserController::class,"dashboard"])->name("dashboard");
-Route::post("/login",[LoginController::class,"login"])->name("login1");
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', [UserController::class, 'dashboard'])
+        ->name('dashboard');
+Route::get('/admin/syllabus-report', [SupervisorController::class, 'adminSyllabusReport'])->name("adminsil");
+Route::resource('system-user', UserController::class);
+Route::resource('subject', SubjectController::class);
+Route::get("/showtl",[SchoolController::class,"showtl"])->name("showtl");
+Route::resource('lesson-plan', LessonPlanController::class);
+Route::get('/assessment', [AssessmentController::class, 'index'])
+    ->name('assessment.index');
+Route::get('/schemes', [SchemeOfWorkController::class, 'index'])->name('scheme.index');
+Route::resource('daily-record', DailyRecordController::class);
+
+
+});
+Route::middleware(['auth','admin'])->group(function(){
 Route::resource('district', DistrictController::class);
 Route::resource('school', SchoolController::class);
-Route::resource('system-user', UserController::class);
+Route::get("/view_work",[OrderController::class,"index1"])->name("vwork");
+Route::get('/admin/supervisor-reports', [SupervisorController::class, 'adminSupervisorReports'])->name("adminsupervisors.reports");
+Route::get('/admin/teacher-workbook-report',[SupervisorController::class,'getTeacherWorkbookReport'])->name("performance");
+Route::get("/profile",[UserController::class,"profile"])->name("profile");
+
+
+
+});
+
+Route::middleware(['auth','supervisor'])->group(function(){
+Route::get('/orders',
+    [OrderController::class,'index'])
+    ->name('orders.index');
+Route::get('/supervisor/student-performance-report', [SupervisorController::class, 'studentPerformanceReport'])
+    ->name('supervisor.student.performance.report');
+
+
+});
+
+Route::middleware(['auth','headmaster'])->group(function(){
 Route::resource('school-class', ClassRoomController::class);
-Route::resource('subject', SubjectController::class);
-Route::resource('lesson-plan', LessonPlanController::class);
+Route::resource('student', StudentController::class);
+
+
+
+});
+
+
+
+
+Route::post('/plans/approve', [LessonPlanController::class, 'approve'])
+    ->name('plans.approve');
+
+Route::post("/login",[LoginController::class,"login"])->name("login1");
 Route::get('/teacher/{id}/lesson-plans',
     [LessonPlanController::class, 'teacherLessonPlans'])
     ->name('teacher.lesson-plans');
-Route::resource('daily-record', DailyRecordController::class);
-Route::resource('student', StudentController::class);
 Route::get("/schhold",[SchoolController::class,"schoold"])->name("schoold");
 Route::get('/school/{id}/teachers', [SchoolController::class, 'teachers'])
     ->name('school.teachers');
 Route::get("/profile",[UserController::class,"profile"])->name("profile");
 Route::get('/teacher/{id}/lesson-plans', [LessonPlanController::class, 'teacherLessonPlans1'])
     ->name('teacher.lesson-plans1');
-Route::get("/showtl",[SchoolController::class,"showtl"])->name("showtl");
 Route::get('/teacher/{id}/daily-records', [UserController::class, 'dailyRecords'])
     ->name('teacher.daily-records');
 Route::post('/logout', [LoginController::class, 'destroy'])
     ->name('logout');
+
 
 Route::get("/forgot",[LoginController::class,"forgot"])->name("forgot");
 Route::post('/forgot-password', [LoginController::class, 'sendResetLink'])->name('password.email');
@@ -49,8 +93,7 @@ Route::post('/reset-password', [LoginController::class, 'updatePassword'])->name
 Route::get('/teacher/{id}/daily-records',
     [DailyRecordController::class, 'teacherDailyRecords'])
     ->name('teacher.daily-records');
-Route::get('/assessment', [AssessmentController::class, 'index'])
-    ->name('assessment.index');
+
 Route::get(
     '/assessment/create/{subject}/{class}',
     [AssessmentController::class,'create']
@@ -72,10 +115,9 @@ Route::get(
     [AssessmentController::class, 'teacherAssessmentBook']
 )->name('teacher.assessment.book');
 
-use App\Http\Controllers\SchemeOfWorkController;
-use App\Http\Controllers\SupervisorController;
 
-Route::get('/schemes', [SchemeOfWorkController::class, 'index'])->name('scheme.index');
+
+
 Route::post('/schemes', [SchemeOfWorkController::class, 'store'])->name('scheme.store');
 Route::put('/schemes/{id}', [SchemeOfWorkController::class, 'update'])->name('scheme.update');
 Route::delete('/schemes/{id}', [SchemeOfWorkController::class, 'destroy'])->name('scheme.destroy');
@@ -93,9 +135,7 @@ Route::patch('/system-user/{id}/toggle-status',
 Route::post('/orders/store',
     [OrderController::class,'store'])
     ->name('orders.store');
-Route::get('/orders',
-    [OrderController::class,'index'])
-    ->name('orders.index');
+
 Route::get('/orders/{id}',
     [OrderController::class,'show'])
     ->name('orders.show');
@@ -108,17 +148,17 @@ Route::get('/get-topics/{subjectId}',
 
 Route::get('/get-subtopics/{topicId}',
     [LessonPlanController::class, 'getSubTopics']);
-Route::get("/view_work",[OrderController::class,"index1"])->name("vwork");
 Route::patch('/orders/{id}/toggle-status', [OrderController::class, 'toggleStatus'])->name('orders.toggle-status');
 Route::post(
     '/lesson-plan-stage/store',
     [LessonPlanStageController::class,'store']
 )->name('lesson-plan-stage.store');
-Route::get('/supervisor/student-performance-report', [SupervisorController::class, 'studentPerformanceReport'])
-    ->name('supervisor.student.performance.report');
+
 Route::post('/report/send',
     [SupervisorController::class,'sendReport'])
     ->name('report.send');
-Route::get('/admin/syllabus-report', [SupervisorController::class, 'adminSyllabusReport'])->name("adminsil");
-// Route ya kuona ripoti za wasimamizi (Supervisors)
-Route::get('/admin/supervisor-reports', [SupervisorController::class, 'adminSupervisorReports'])->name("adminsupervisors.reports");
+Route::get('/blocked', function () {
+    return view('blocked');
+})->name('blocked');
+Route::get('/all_logs',[UserController::class,"all_logs"])->name('all_logs');
+Route::get('/data-refresh',[UserController::class,'refresh'])->name('dashboard.table');

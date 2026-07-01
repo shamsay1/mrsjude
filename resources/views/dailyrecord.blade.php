@@ -145,6 +145,11 @@
 </div>
 
         <!-- Daily Record Table -->
+         @if(Auth::user()->role =="supervisor" || Auth::user()->role =="headmaster")
+    <a href="/showtl" class="btn btn-success text-white mb-2" style="text-decoration: none;">
+        Back
+    </a>
+    @endif
         <div class="card shadow-sm">
 
             <div class="card-body">

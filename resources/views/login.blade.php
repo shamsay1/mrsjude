@@ -83,7 +83,7 @@
         DTWSMS
     </h4>
     @if(session('success'))
-    <span style="color: green">{{ $session('sucess') }}</span>
+    <span style="color: green">{{ $session('success') }}</span>
     @endif
 
     <p class="text-center text-muted mb-3" style="font-size: 14px;">

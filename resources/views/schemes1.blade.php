@@ -397,6 +397,11 @@
 </div>
 
         <!-- TABLE -->
+         @if(Auth::user()->role =="supervisor" || Auth::user()->role =="headmaster")
+    <a href="/showtl" class="btn btn-success text-white mb-2" style="text-decoration: none;">
+        Back
+    </a>
+    @endif
         <div class="table-responsive">
             @if(Auth::user()->role != "teacher")
 <div class="card mb-3" style="border-radius: 2px">

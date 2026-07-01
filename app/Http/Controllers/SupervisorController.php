@@ -233,18 +233,17 @@ class SupervisorController extends Controller
                 ->where('topic_id', $topic->id)
                 ->count();
 
-            // 3. Hesabu sub-topics ngapi zina lesson plan ya 'completed' kwa shule na darasa hili
-            // Hapa tunatumia JOIN kusafiri kwenda kwenye table ya subjects ili kupata darasa
+          
             $completedSubTopics = DB::table('lesson_plans')
                 ->join('subjects', 'lesson_plans.subject_id', '=', 'subjects.id')
                 ->where('lesson_plans.school_id', $schoolId)
-                ->where('subjects.class_room_id', $classId) // Tunachuja kwa darasa lililopo kwenye subjects
+                ->where('subjects.class_room_id', $classId) 
                 ->where('lesson_plans.topic_id', $topic->id)
                 ->where('lesson_plans.status', 'completed')
-                ->distinct('lesson_plans.sub_topic_id') // Inazuia kuhesabu sub-topic moja mara mbili
+                ->distinct('lesson_plans.sub_topic_id') 
                 ->count();
 
-            // 4. Logic ya Maamuzi: Kama zote zimeisha, status ni Covered, vinginevyo ni Uncovered
+           
             if ($totalSubTopics > 0 && $completedSubTopics >= $totalSubTopics) {
                 $status = 'Covered';
                 $badgeColor = 'success'; // Kijani
@@ -253,10 +252,10 @@ class SupervisorController extends Controller
                 $badgeColor = 'danger'; // Nyekundu
             }
 
-            // Tafuta asilimia (progress bar) ya mada hii
+           
             $progress = $totalSubTopics > 0 ? round(($completedSubTopics / $totalSubTopics) * 100, 1) : 0;
 
-            // Weka data kwenye collection kwa ajili ya Blade View
+            
             $topicsReport->push([
                 'topic_name'           => $topic->topic_name,
                 'total_sub_topics'     => $totalSubTopics,
@@ -271,13 +270,11 @@ class SupervisorController extends Controller
     }
     public function adminSupervisorReports(Request $request)
 {
-    $schoolId = $request->input('school_id'); // ID ya Shule kutoka kwenye fomu
-
-    // Tunasafisha Query yetu kwa kuunganisha tables zingine ili kupata majina badala ya ID tupu
+    $schoolId = $request->input('school_id'); 
     $query = DB::table('reports')
         ->join('schools', 'reports.school_id', '=', 'schools.id')
         ->join('class_rooms', 'reports.class_room_id', '=', 'class_rooms.id')
-        ->join('system_users', 'reports.supervisor_id', '=', 'system_users.id') // Inalingana na foreign key yako ya system_users
+        ->join('system_users', 'reports.supervisor_id', '=', 'system_users.id') 
         ->select(
             'reports.*',
             'schools.school_name',
@@ -285,14 +282,96 @@ class SupervisorController extends Controller
              DB::raw("CONCAT(system_users.firstname, ' ', system_users.middlename, ' ', system_users.lastname) as supervisor_name")
         );
 
-    // Kama Admin amechagua shule maalumu, chuja kwa shule hiyo tu
+    
     if ($schoolId) {
         $query->where('reports.school_id', $schoolId);
     }
 
-    // Pata ripoti zote zilizopangwa kuanzia mpya zaidi (Latest)
+    
     $reports = $query->orderBy('reports.created_at', 'desc')->get();
 
     return view('adminreport', compact('reports', 'schoolId'));
+}
+
+    public function getTeacherWorkbookReport(Request $request) {
+    $schoolId = $request->input('school_id');
+    $classId = $request->input('class_id');
+    $startDate = $request->input('start_date');
+    $endDate = $request->input('end_date');
+
+    if (!$schoolId || !$startDate || !$endDate) {
+        return view('teacherperf', ['teachersReport' => []]);
+    }
+
+    
+    $query = DB::table('system_users as u')
+        ->join('subjects as s', 'u.id', '=', 's.teacher_id')
+        ->join('class_rooms as cr', 's.class_room_id', '=', 'cr.id')
+        ->where('u.role', 'teacher')
+        ->where('u.status', 'Active')
+        ->where('cr.school_id', $schoolId);
+
+    if ($classId) {
+        $query->where('cr.id', $classId);
+    }
+
+    $records = $query->select(
+        'u.id as teacher_id',
+        DB::raw("CONCAT(u.firstname, ' ', u.middlename, ' ', u.lastname) as teacher_name"),
+        's.id as subject_id',
+        's.subjectName as subject_name',
+        'cr.class_name'
+    )->get();
+
+    $teachersReport = [];
+
+    foreach ($records as $row) {
+        
+        $periodsTaught =DB::table('daily_recordings')
+            ->where('teacher_id', $row->teacher_id)
+            ->where('subject_id', $row->subject_id)
+            ->whereBetween('date', [$startDate, $endDate])
+            ->count();
+
+       
+        $lessonPlans = DB::table('lesson_plans')
+            ->where('subject_id', $row->subject_id)
+            ->whereBetween('lesson_date', [$startDate, $endDate])
+            ->count();
+
+        
+        $completedPlans = DB::table('lesson_plans')
+            ->where('subject_id', $row->subject_id)
+            ->where('status', 'completed')
+            ->whereBetween('lesson_date', [$startDate, $endDate])
+            ->count();
+
+        $progress = $lessonPlans > 0 ? round(($completedPlans / $lessonPlans) * 100) : 0;
+
+       
+        if ($periodsTaught > 5 && $progress >= 75) {
+            $status = 'Excellent';
+            $color = 'success';
+        } elseif ($periodsTaught > 0) {
+            $status = 'Satisfactory';
+            $color = 'warning';
+        } else {
+            $status = 'Inactive';
+            $color = 'danger';
+        }
+
+        $teachersReport[] = [
+            'teacher_name' => $row->teacher_name,
+            'subject_name' => $row->subject_name,
+            'class_name' => $row->class_name,
+            'total_periods_taught' => $periodsTaught,
+            'total_lesson_plans' => $lessonPlans,
+            'progress' => $progress,
+            'status' => $status,
+            'badge_color' => $color
+        ];
+    }
+
+    return view('teacherperf', compact('teachersReport'));
 }
 }

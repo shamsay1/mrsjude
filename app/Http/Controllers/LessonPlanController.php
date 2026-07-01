@@ -82,12 +82,27 @@ public function getSubTopics($topicId)
     'teaching_methods' => $request->teaching_methods,
     'teaching_materials' => $request->teaching_materials,
     'evaluation' => $request->evaluation,
-    'status'             => 'completed',
+    'status'             => 'pending',
 ]);
 
         return redirect()->back()
             ->with('success', 'Lesson Plan added successfully');
     }
+
+    public function approve(Request $request)
+{
+    $request->validate([
+        'plan_id' => 'required|exists:lesson_plans,id'
+    ]);
+
+    $plan = LessonPlan::findOrFail($request->plan_id);
+
+    $plan->status = 'completed';
+
+    $plan->save();
+
+    return back()->with('success', 'Plan approved successfully.');
+}
 
     // Delete
     public function destroy($id)
