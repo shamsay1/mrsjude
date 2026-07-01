@@ -32,8 +32,6 @@ $table->foreignId('sub_topic_id')
 
     $table->text('teaching_materials');
 
-    $table->text('evaluation');
-
     $table->date('lesson_date');
 
     $table->string('status')->default('pending');

@@ -290,7 +290,13 @@
                             <textarea name="objectives"
     rows="4"
     class="form-control"
-    required>The student should be able to </textarea>
+    required>The student should be able to;
+    (i).................
+    (ii).................
+    (iii).................
+    (iv).................
+    (v).................
+ </textarea>
 
                         </div>
 
@@ -303,59 +309,84 @@
 
     <label>Teaching Method</label>
 
-    <select name="teaching_methods"
-        class="form-control"
-        required>
+    <label class="form-label"><strong>Select Teaching Method(s)</strong></label>
 
-        <option value="">
-            Select Teaching Method
-        </option>
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" name="teaching_methods[]" value="Question and Answer" id="method1">
+    <label class="form-check-label" for="method1">
+        Question and Answer
+    </label>
+</div>
 
-        <option value="Question and Answer">
-            Question and Answer
-        </option>
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" name="teaching_methods[]" value="Group Discussion" id="method2">
+    <label class="form-check-label" for="method2">
+        Group Discussion
+    </label>
+</div>
 
-        <option value="Group Discussion">
-            Group Discussion
-        </option>
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" name="teaching_methods[]" value="Lecture Method" id="method3">
+    <label class="form-check-label" for="method3">
+        Lecture Method
+    </label>
+</div>
 
-        <option value="Lecture Method">
-            Lecture Method
-        </option>
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" name="teaching_methods[]" value="Demonstration" id="method4">
+    <label class="form-check-label" for="method4">
+        Demonstration
+    </label>
+</div>
 
-        <option value="Demonstration">
-            Demonstration
-        </option>
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" name="teaching_methods[]" value="Brainstorming" id="method5">
+    <label class="form-check-label" for="method5">
+        Brainstorming
+    </label>
+</div>
 
-        <option value="Brainstorming">
-            Brainstorming
-        </option>
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" name="teaching_methods[]" value="Role Play" id="method6">
+    <label class="form-check-label" for="method6">
+        Role Play
+    </label>
+</div>
 
-        <option value="Role Play">
-            Role Play
-        </option>
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" name="teaching_methods[]" value="Project Work" id="method7">
+    <label class="form-check-label" for="method7">
+        Project Work
+    </label>
+</div>
 
-        <option value="Project Work">
-            Project Work
-        </option>
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" name="teaching_methods[]" value="Practical Work" id="method8">
+    <label class="form-check-label" for="method8">
+        Practical Work
+    </label>
+</div>
 
-        <option value="Practical Work">
-            Practical Work
-        </option>
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" name="teaching_methods[]" value="Presentation" id="method9">
+    <label class="form-check-label" for="method9">
+        Presentation
+    </label>
+</div>
 
-        <option value="Presentation">
-            Presentation
-        </option>
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" name="teaching_methods[]" value="Peer Teaching" id="method10">
+    <label class="form-check-label" for="method10">
+        Peer Teaching
+    </label>
+</div>
 
-        <option value="Peer Teaching">
-            Peer Teaching
-        </option>
-
-        <option value="Case Study">
-            Case Study
-        </option>
-
-    </select>
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" name="teaching_methods[]" value="Case Study" id="method11">
+    <label class="form-check-label" for="method11">
+        Case Study
+    </label>
+</div>
 
 </div>
 
@@ -373,7 +404,7 @@
                     </div>
 
                     <!-- STEP 4 -->
-                    <div class="step">
+                    <!-- <div class="step">
 
                         <div class="mb-3">
 
@@ -386,7 +417,7 @@
 
                         </div>
 
-                    </div>
+                    </div> -->
 
                 </div>
 
@@ -667,88 +698,11 @@ document.getElementById('topic_id')
                 {!! nl2br(e($plan->references ?? '')) !!}
             </div>
 
-            <div class="section-title">
-                Status:
-            </div>
-
-            <div class="content-box">
-                @if($plan->status == "completed")
-                <span class="badge bg-success">Already reviewed</span>
-                @else
-                <span class="bagde bg-danger">{{$plan->status}}</span>
-
-                @endif
-            </div>
-
         </div>
 
         <!-- BUTTONS -->
 
         <div class="mt-4 no-print">
-            @if(Auth::user()->role == "headmaster")
-            <button
-    type="button"
-    class="btn btn-primary approveBtn mb-3"
-    data-bs-toggle="modal"
-    data-bs-target="#approveModal"
-    data-id="{{ $plan->id }}">
-    Approve
-</button>
-<div class="modal fade" id="approveModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-
-            <form action="{{ route('plans.approve') }}" method="POST">
-                @csrf
-
-                <div class="modal-header">
-                    <h5 class="modal-title">Approve Plan</h5>
-
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"></button>
-                </div>
-
-                <div class="modal-body">
-
-                    <input type="hidden" name="plan_id" id="plan_id">
-
-                    <p>Are you sure you want to approve this plan?</p>
-
-                </div>
-
-                <div class="modal-footer">
-
-                    <button type="button"
-                            class="btn btn-secondary"
-                            data-bs-dismiss="modal">
-                        Cancel
-                    </button>
-
-                    <button type="submit"
-                            class="btn btn-primary">
-                        Approve
-                    </button>
-
-                </div>
-
-            </form>
-
-        </div>
-    </div>
-</div>
-<script>
-document.querySelectorAll('.approveBtn').forEach(button => {
-
-    button.addEventListener('click', function () {
-
-        document.getElementById('plan_id').value = this.dataset.id;
-
-    });
-
-});
-</script>
-   @else
             <button class="btn btn-success"
         data-bs-toggle="modal"
         data-bs-target="#stageModal{{ $plan->id }}">
@@ -790,8 +744,6 @@ document.querySelectorAll('.approveBtn').forEach(button => {
         </div>
 
     </div>
-
-    @endif
 
     <div class="modal fade" id="stageModal{{ $plan->id }}">
     <div class="modal-dialog modal-xl">
@@ -838,28 +790,84 @@ document.querySelectorAll('.approveBtn').forEach(button => {
     @endphp
 
     @foreach($stages as $index => $stage)
-    <tr>
+                    @if($index ==0)
+                    <tr>
         <td>
             {{ $stage }}
             <input type="hidden" name="stages[{{ $index }}][stage_name]" value="{{ $stage }}">
         </td>
         <td>
-            <input type="number"
-       name="stages[{{ $index }}][minutes]"
-       class="form-control minutes"
-       min="0"
-       required>
+            <input type="number" name="stages[{{ $index }}][minutes]" min="0" max="21" value="10" class="form-control" required>
         </td>
         <td>
-            <textarea name="stages[{{ $index }}][teaching_activities]" class="form-control" rows="3" required></textarea>
+            <textarea name="stages[{{ $index }}][teaching_activities]"   class="form-control" rows="3" required>By using brainstorming,teacher will guide students to......</textarea>
         </td>
         <td>
-            <textarea name="stages[{{ $index }}][learning_activities]" class="form-control" rows="3" required></textarea>
+            <textarea name="stages[{{ $index }}][learning_activities]" class="form-control" rows="3" required>The student will be ...</textarea>
         </td>
         <td>
-            <textarea name="stages[{{ $index }}][assessment]" class="form-control" rows="3" required></textarea>
+            <textarea name="stages[{{ $index }}][assessment]" class="form-control" rows="3" required>Question and Answer</textarea>
         </td>
     </tr>
+                    @elseif($index==1)
+                    <tr>
+        <td>
+            {{ $stage }}
+            <input type="hidden" name="stages[{{ $index }}][stage_name]" value="{{ $stage }}">
+        </td>
+        <td>
+            <input type="number" name="stages[{{ $index }}][minutes]" min="0" max="40" value="40" class="form-control" required>
+        </td>
+        <td>
+                        <textarea name="stages[{{ $index }}][teaching_activities]" class="form-control" rows="3" required>By using Lecture method,teacher will guide student to</textarea>
+
+        </td>
+        <td>
+            <textarea name="stages[{{ $index }}][learning_activities]" class="form-control" rows="3" required>The student will be ...</textarea>
+        </td>
+        <td>
+            <textarea name="stages[{{ $index }}][assessment]" class="form-control" rows="3" required>Question and Answer</textarea>
+        </td>
+    </tr>
+    @elseif($index==2)
+                    <tr>
+        <td>
+            {{ $stage }}
+            <input type="hidden" name="stages[{{ $index }}][stage_name]" value="{{ $stage }}">
+        </td>
+        <td>
+            <input type="number" name="stages[{{ $index }}][minutes]" min="0" max="15" value="15" class="form-control" required>
+        </td>
+        <td>
+            <textarea name="stages[{{ $index }}][teaching_activities]" class="form-control" rows="3" required>By demonstration method,teacher will guide student to...</textarea>
+        </td>
+        <td>
+            <textarea name="stages[{{ $index }}][learning_activities]" class="form-control" rows="3" required>The student will be ...</textarea>
+        </td>
+        <td>
+            <textarea name="stages[{{ $index }}][assessment]" class="form-control" rows="3" required>Question and Answer</textarea>
+        </td>
+    </tr>
+    @elseif($index==3)
+                    <tr>
+        <td>
+            {{ $stage }}
+            <input type="hidden" name="stages[{{ $index }}][stage_name]" value="{{ $stage }}">
+        </td>
+        <td>
+            <input type="number" name="stages[{{ $index }}][minutes]" min="0" max="15" value="15" class="form-control" required>
+        </td>
+        <td>
+            <textarea name="stages[{{ $index }}][teaching_activities]" class="form-control" rows="3" required>By using question and answer,teacher will guide student to .... </textarea>
+        </td>
+        <td>
+            <textarea name="stages[{{ $index }}][learning_activities]" class="form-control" rows="3" required>The student will be ...</textarea>
+        </td>
+        <td>
+            <textarea name="stages[{{ $index }}][assessment]" class="form-control" rows="3" required>Question and Answer</textarea>
+        </td>
+    </tr>
+                    @endif
     @endforeach
 </tbody>
                     </table>
@@ -928,7 +936,7 @@ document.querySelectorAll('.approveBtn').forEach(button => {
         @endif
     </tbody>
 </table>
- @if(Auth::user()->role =="supervisor" || Auth::user()->role =="headmaster")
+ @if(Auth::user()->role =="supervisor")
     <a href="/showtl" class="btn btn-success text-white" style="text-decoration: none;">
         Back
     </a>
@@ -937,35 +945,7 @@ document.querySelectorAll('.approveBtn').forEach(button => {
 
 </div>
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
 
-    const minuteInputs = document.querySelectorAll(".minutes");
-
-    minuteInputs.forEach(input => {
-
-        input.addEventListener("input", function () {
-
-            let total = 0;
-
-            minuteInputs.forEach(item => {
-                total += parseInt(item.value) || 0;
-            });
-
-            if (total > 80) {
-
-                alert("Total minutes cannot exceed 80.");
-
-                this.value = "";
-
-            }
-
-        });
-
-    });
-
-});
-</script>
 
 <script>
 

@@ -117,19 +117,19 @@
                     <div class="daily-step">
                         <div class="mb-3">
                             <label class="fw-bold">Work Done By Teacher</label>
-                            <textarea name="work_done_by_teacher" rows="4" class="form-control" required></textarea>
+                            <textarea name="work_done_by_teacher" rows="4" class="form-control" required>Teacher was guide the students to...</textarea>
                         </div>
 
                         <div class="mb-3">
                             <label class="fw-bold">Work Done By Student</label>
-                            <textarea name="work_done_by_student" rows="4" class="form-control" required></textarea>
+                            <textarea name="work_done_by_student" rows="4" class="form-control" required>The students was able to....</textarea>
                         </div>
                     </div>
 
                     <div class="daily-step">
                         <div class="mb-3">
                             <label class="fw-bold">Evaluation / Remarks</label>
-                            <textarea name="remarks" rows="4" class="form-control"></textarea>
+                            <textarea name="remarks" rows="4" class="form-control">The lesson was understand and understood...</textarea>
                         </div>
                     </div>
                 </div>
@@ -145,11 +145,6 @@
 </div>
 
         <!-- Daily Record Table -->
-         @if(Auth::user()->role =="supervisor" || Auth::user()->role =="headmaster")
-    <a href="/showtl" class="btn btn-success text-white mb-2" style="text-decoration: none;">
-        Back
-    </a>
-    @endif
         <div class="card shadow-sm">
 
             <div class="card-body">
@@ -157,7 +152,7 @@
                 <center>
                     <h3 class="mb-4">
                         <b>
-                            KUMBUKUMBU ZA SOMO ZA KILA SIKU
+                            
                             (DAILY RECORDS)
                         </b>
                     </h3>
@@ -168,52 +163,47 @@
                     <table class="table table-bordered">
 
                         <thead>
+    <tr>
+        <th>
+            Day/Date
+        </th>
 
-                            <tr>
+        <th>
+            Class
+        </th>
 
-                                <th>
-                                    Siku/Tarehe
-                                </th>
+        <th>
+            Subject
+        </th>
 
-                                <th>
-                                    Darasa
-                                </th>
+        <th>
+            Period
+        </th>
 
-                                <th>
-                                    Somo
-                                </th>
+        <th>
+            Main Topic and Subtopic
+        </th>
 
-                                <th>
-                                    Kipindi
-                                </th>
+        <th>
+            Teacher's Activities
+        </th>
 
-                                <th>
-                                    Mada kuu na Mada ndogo
-                                </th>
+        <th>
+            Student's Activities
+        </th>
 
-                                <th>
-                                    Kazi iliyofanywa na mwalimu
-                                </th>
+        <th>
+            Remarks
+        </th>
 
-                                <th>
-                                    Kazi iliyofanywa na mwanafunzi
-                                </th>
+        @if(Auth::user()->role == "teacher")
+        <th>
+            Action
+        </th>
+        @endif
 
-                                <th>
-                                    Maelezo
-                                </th>
-
-                               
-        @if(Auth::user()->role =="teacher")
-
-                                <th>
-                                    Action
-                                </th>
-                                @endif
-
-                            </tr>
-
-                        </thead>
+    </tr>
+</thead>
 
                         <tbody>
 

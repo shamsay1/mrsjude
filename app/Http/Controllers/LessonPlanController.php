@@ -59,35 +59,36 @@ public function getSubTopics($topicId)
 }
 
     // Store Data
-    public function store(Request $request)
-    {
-        $request->validate([
-            'subject_id' => 'required',
-            'topic_id' => 'required',
-            'sub_topic_id' => 'required',
-            'objectives' => 'required',
-            'teaching_methods' => 'required',
-            'teaching_materials' => 'required',
-            'evaluation' => 'required',
-            'lesson_date' => 'required'
-        ]);
+   public function store(Request $request)
+{
+    $request->validate([
+        'subject_id' => 'required',
+        'topic_id' => 'required',
+        'sub_topic_id' => 'required',
+        'objectives' => 'required',
+        'teaching_methods' => 'required|array|min:1',
+        'teaching_materials' => 'required',
+        'lesson_date' => 'required'
+    ]);
 
-        LessonPlan::create([
-    'subject_id' => $request->subject_id,
-    'school_id' => Auth::user()->school_id,
-    'topic_id' => $request->topic_id,
-    'sub_topic_id' => $request->sub_topic_id,
-    'lesson_date' => $request->lesson_date,
-    'objectives' => $request->objectives,
-    'teaching_methods' => $request->teaching_methods,
-    'teaching_materials' => $request->teaching_materials,
-    'evaluation' => $request->evaluation,
-    'status'             => 'pending',
-]);
+    LessonPlan::create([
+        'subject_id' => $request->subject_id,
+        'school_id' => Auth::user()->school_id,
+        'topic_id' => $request->topic_id,
+        'sub_topic_id' => $request->sub_topic_id,
+        'lesson_date' => $request->lesson_date,
+        'objectives' => $request->objectives,
 
-        return redirect()->back()
-            ->with('success', 'Lesson Plan added successfully');
-    }
+        // Badilisha array kuwa string
+        'teaching_methods' => implode(', ', $request->teaching_methods),
+
+        'teaching_materials' => $request->teaching_materials,
+        'status' => 'pending',
+    ]);
+
+    return redirect()->back()
+        ->with('success', 'Lesson Plan added successfully');
+}
 
     public function approve(Request $request)
 {

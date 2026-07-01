@@ -262,7 +262,7 @@
 
                                 <textarea name="main_competence"
                                     class="form-control"
-                                    rows="3">At the end of the course,the student should able to</textarea>
+                                    rows="3">At the end of the topic,the student should have  ablility to demonstrate</textarea>
                             </div>
 
                         </div>
@@ -277,15 +277,21 @@
 
                             <textarea name="specific_competence"
                                 class="form-control"
-                                rows="3">The student should be able to</textarea>
+                                rows="3">At the end of the Topic,student should be able to ....</textarea>
                         </div>
 
                         <div class="mb-3">
-                            <label>Learning Activity</label>
+                            <label>Main Learning Activity</label>
 
                             <textarea name="learning_activity"
                                 class="form-control"
-                                rows="3"></textarea>
+                                rows="3">Student should be able to
+                            (i)
+                            (ii)
+                            (iii)
+                            (iv)
+                            (v)
+                            </textarea>
                         </div>
 
                         <div class="mb-3">
@@ -360,7 +366,7 @@
 
                             <textarea name="remarks"
                                 class="form-control"
-                                rows="4">Prepared as planned.</textarea>
+                                rows="4">The lesson was taught and understood</textarea>
                         </div>
 
                     </div>
@@ -397,11 +403,6 @@
 </div>
 
         <!-- TABLE -->
-         @if(Auth::user()->role =="supervisor" || Auth::user()->role =="headmaster")
-    <a href="/showtl" class="btn btn-success text-white mb-2" style="text-decoration: none;">
-        Back
-    </a>
-    @endif
         <div class="table-responsive">
             @if(Auth::user()->role != "teacher")
 <div class="card mb-3" style="border-radius: 2px">
