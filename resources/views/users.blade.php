@@ -186,105 +186,24 @@
         @if(Auth::user()->role!="headmaster")
         <form method="GET" action="{{ route('system-user.index') }}">
 
-    <div class="row mb-3">
-
-        <!-- ROLE -->
-        <div class="col-md-3">
-
-            <label>Filter By Role</label>
-
-            <select name="role" class="form-control">
-
-                <option value="">All Roles</option>
-
-                <option value="teacher"
-                    {{ request('role') == 'teacher' ? 'selected' : '' }}>
-
-                    Teacher
-
-                </option>
-
-                <option value="headmaster"
-                    {{ request('role') == 'headmaster' ? 'selected' : '' }}>
-
-                    Headmaster
-
-                </option>
-                <option value="supervisor"
-                    {{ request('role') == 'supervisor' ? 'selected' : '' }}>
-
-                    Supervisor
-
-                </option>
-
-            </select>
-
-        </div>
-
-        <!-- DISTRICT -->
-        @if(Auth::user()->role == "admin")
-        <div class="col-md-3">
-
-            <label>Filter By District</label>
-
-            <select name="district_id" class="form-control">
-
-                <option value="">All Districts</option>
-
-                @foreach($districts as $district)
-
-                    <option value="{{ $district->id }}"
-                        {{ request('district_id') == $district->id ? 'selected' : '' }}>
-
-                        {{ $district->district_name }}
-
-                    </option>
-
-                @endforeach
-
-            </select>
-
-        </div>
-        @endif
-
-        <!-- SCHOOL -->
-        <div class="col-md-3">
-
-            <label>Filter By School</label>
-
-            <select name="school_id" class="form-control">
-
-                <option value="">All Schools</option>
-
-                @foreach($schools as $school)
-
-                    <option value="{{ $school->id }}"
-                        {{ request('school_id') == $school->id ? 'selected' : '' }}>
-
-                        {{ $school->school_name }}
-
-                    </option>
-
-                @endforeach
-
-            </select>
-
-        </div>
-        <div class="col-md-3">
-            <br>
-            <button class="btn btn-primary">
-        Filter
+    <div class="mb-3">
+    <!-- Hakikisha kuna type="button" kwenye kila button -->
+    <button type="button" class="btn btn-primary filter-btn active" data-role="">
+        All
     </button>
 
-    <a href="{{ route('system-user.index') }}"
-        class="btn btn-secondary">
+    <button type="button" class="btn btn-success filter-btn" data-role="headmaster">
+        Headmaster
+    </button>
 
-        Reset
+    <button type="button" class="btn btn-info text-white filter-btn" data-role="teacher">
+        Teacher
+    </button>
 
-    </a>
-        </div>
-
-    </div>
+    <button type="button" class="btn btn-warning filter-btn" data-role="supervisor">
+        Supervisor
+    </button>
+</div>
 
     
 
@@ -294,358 +213,61 @@
       <h2 style="color: green;font-family: 'Times New Roman', Times, serif">Teachers Information</h2>
       <hr>
       @endif
-        <table class="table table-sm table-hover">
-
-            <thead class="bg-secondary text-white">
-
-                <tr>
-
-                    <th>S/N</th>
-                    <th>Full Name</th>
-                    <th>Email</th>
-                    <th>Gender</th>
-                    <th>School</th>
-                    <th>Status</th>
-                    <th>Role</th>
-                    <th>Action</th>
-
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-                @forelse ($users as $index => $user)
-
-                    <tr>
-
-                        <td>{{ $index + 1 }}</td>
-
-                        <td>
-                            {{ $user->firstname }}
-                            {{ $user->middlename }}
-                            {{ $user->lastname }}
-                        </td>
-
-                        <td>{{ $user->email }}</td>
-
-                        <td>{{ $user->gender }}</td>
-
-                        <td>{{ $user->school->school_name ?? 'N/A' }}</td>
-                        <td>
-                            @if($user->status == 'Active')
-                                <span class="badge bg-success">Active</span>
-                            @else
-                                <span class="badge bg-danger">Deactive</span>
-                            @endif
-                        </td>
-                        <td>
-                            <span class="badge bg-success">
-                                {{ $user->role }}
-                            </span>
-                        </td>
-
-                        <td>
-
-                            <!-- Edit Button -->
-                            <button class="btn btn-sm btn-primary"
-                                data-bs-toggle="modal"
-                                data-bs-target="#editUserModal{{ $user->id }}">
-
-                                <i class="bi bi-pencil-square"></i>
-
-                            </button>
-                            @if($user->role == 'supervisor')
-
-<button class="btn btn-sm btn-warning"
-        data-bs-toggle="modal"
-        data-bs-target="#assignOrderModal{{ $user->id }}">
-    <i class="bi bi-clipboard-check"></i>
-</button>
-
-<!-- Assign Order Modal -->
-<div class="modal fade" id="assignOrderModal{{ $user->id }}">
-    <div class="modal-dialog">
-        <div class="modal-content">
-
-            <div class="modal-header bg-warning text-dark">
-                <h5>Assign Inspection Order</h5>
-                <button class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-
-            <form action="{{ route('orders.store') }}" method="POST">
-                @csrf
-
-                <div class="modal-body">
-
-                    <input type="hidden"
-                           name="supervisor_id"
-                           value="{{ $user->id }}">
-
-                    <div class="mb-3">
-                        <label>School</label>
-                        <select name="school_id"
-                                class="form-control"
-                                required>
-
-                            <option value="">Select School</option>
-
-                            @foreach($schools as $school)
-                                <option value="{{ $school->id }}">
-                                    {{ $school->school_name }}
-                                </option>
-                            @endforeach
-
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label>Inspection Date</label>
-                        <input type="date"
-                               name="inspection_date"
-                               class="form-control"
-                               required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label>Instruction</label>
-                        <textarea name="instruction"
-                                  rows="4"
-                                  class="form-control"
-                                  required></textarea>
-                    </div>
-
-                </div>
-
-                <div class="modal-footer">
-                    <button class="btn btn-warning">
-                        Assign Order
-                    </button>
-                </div>
-
-            </form>
-
-        </div>
-    </div>
+        <div id="usersTable">
+    @include('partials')
 </div>
 
-@endif
-
-                            <!-- Delete -->
-                            <form action="{{ route('system-user.toggle-status', $user->id) }}"
-      method="POST"
-      style="display:inline-block;">
-
-    @csrf
-    @method('PATCH')
-
-    <button
-        class="btn btn-sm {{ $user->status == 'Active' ? 'btn-danger' : 'btn-success' }}"
-        onclick="return confirm('Are you sure you want to {{ $user->status == 'Active' ? 'deactivate' : 'activate' }} this user?')">
-
-        {{ $user->status == 'Active' ? 'Deactivate' : 'Activate' }}
-
-    </button>
-
-</form>
-
-                            <!-- Edit Modal -->
-                            <div class="modal fade"
-                                id="editUserModal{{ $user->id }}">
-
-                                <div class="modal-dialog modal-xl">
-
-                                    <div class="modal-content">
-
-                                        <div class="modal-header bg-primary text-white">
-
-                                            <h5>Edit User</h5>
-
-                                            <button class="btn-close"
-                                                data-bs-dismiss="modal"></button>
-
-                                        </div>
-
-                                        <form action="{{ route('system-user.update', $user->id) }}"
-                                            method="POST">
-
-                                            @csrf
-                                            @method('PUT')
-
-                                            <div class="modal-body">
-
-                                                <div class="row">
-
-                                                    <div class="col-md-4 mb-3">
-
-                                                        <label>First Name</label>
-
-                                                        <input type="text"
-                                                            name="firstname"
-                                                            value="{{ $user->firstname }}"
-                                                            class="form-control">
-
-                                                    </div>
-
-                                                    <div class="col-md-4 mb-3">
-
-                                                        <label>Middle Name</label>
-
-                                                        <input type="text"
-                                                            name="middlename"
-                                                            value="{{ $user->middlename }}"
-                                                            class="form-control">
-
-                                                    </div>
-
-                                                    <div class="col-md-4 mb-3">
-
-                                                        <label>Last Name</label>
-
-                                                        <input type="text"
-                                                            name="lastname"
-                                                            value="{{ $user->lastname }}"
-                                                            class="form-control">
-
-                                                    </div>
-
-                                                </div>
-
-                                                <div class="row">
-
-                                                    <div class="col-md-4 mb-3">
-
-                                                        <label>Email</label>
-
-                                                        <input type="email"
-                                                            name="email"
-                                                            value="{{ $user->email }}"
-                                                            class="form-control">
-
-                                                    </div>
-
-                                                    <div class="col-md-4 mb-3">
-
-                                                        <label>Gender</label>
-
-                                                        <select name="gender"
-                                                            class="form-control">
-
-                                                            <option value="Male"
-                                                                {{ $user->gender == 'Male' ? 'selected' : '' }}>
-
-                                                                Male
-
-                                                            </option>
-
-                                                            <option value="Female"
-                                                                {{ $user->gender == 'Female' ? 'selected' : '' }}>
-
-                                                                Female
-
-                                                            </option>
-
-                                                        </select>
-
-                                                    </div>
-
-                                                    <div class="col-md-4 mb-3">
-
-                                                        <label>Password</label>
-
-                                                        <input type="password"
-                                                            name="password"
-                                                            class="form-control"
-                                                            placeholder="Leave blank if no change">
-
-                                                    </div>
-
-                                                </div>
-
-                                                <div class="row">
-
-                                                    <div class="col-md-6 mb-3">
-
-                                                        <label>District</label>
-
-                                                        <select name="district_id"
-                                                            class="form-control">
-
-                                                            @foreach ($districts as $district)
-
-                                                                <option value="{{ $district->id }}"
-                                                                    {{ $user->district_id == $district->id ? 'selected' : '' }}>
-
-                                                                    {{ $district->district_name }}
-
-                                                                </option>
-
-                                                            @endforeach
-
-                                                        </select>
-
-                                                    </div>
-
-                                                    <div class="col-md-6 mb-3">
-
-                                                        <label>School</label>
-
-                                                        <select name="school_id"
-                                                            class="form-control">
-
-                                                            @foreach ($schools as $school)
-
-                                                                <option value="{{ $school->id }}"
-                                                                    {{ $user->school_id == $school->id ? 'selected' : '' }}>
-
-                                                                    {{ $school->school_name }}
-
-                                                                </option>
-
-                                                            @endforeach
-
-                                                        </select>
-
-                                                    </div>
-
-                                                </div>
-
-                                            </div>
-
-                                            <div class="modal-footer">
-
-                                                <button class="btn btn-success">
-                                                    Update
-                                                </button>
-
-                                            </div>
-
-                                        </form>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        </td>
-
-                    </tr>
-
-                @empty
-
-                    <tr>
-                        <td colspan="100%" style="text-align: center">No Record Found</td>
-                    </tr>
-
-                @endforelse
-
-            </tbody>
-
-        </table>
-        <div class="mt-3" id="paginationLinks">
-        {{ $users->links() }}
-    </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function(){
+    // Kazi ya kubofya filter za Role
+    $('.filter-btn').click(function(e) {
+    e.preventDefault(); // Hii inazuia kabisa fomu au ukurasa usijirefreshi (no reload)
+
+    // Badilisha muonekano wa button iliyobonyezwa
+    $('.filter-btn').removeClass('active');
+    $(this).addClass('active');
+    
+    // Chukua role na upakie data
+    let role = $(this).data('role');
+    loadUsers(role, 1); 
+});
+
+    // Kazi ya kupakia data (AJAX Load)
+    function loadUsers(role, page = 1) {
+        $.ajax({
+            url: "{{ route('system-user.index') }}",
+            type: "GET",
+            data: {
+                role: role,
+                page: page
+            },
+            beforeSend: function() {
+                $('#usersTable').html(
+                    '<div class="text-center p-5"><div class="spinner-border text-primary"></div><p class="mt-2">Loading Users...</p></div>'
+                );
+            },
+            success: function(response) {
+                $('#usersTable').html(response);
+            },
+            error: function(xhr) {
+                console.log(xhr.responseText);
+                alert('Kuna hitilafu imetokea wakati wa kupakia data.');
+            }
+        });
+    }
+
+    // AJAX Pagination kwa ajili ya Links zilizopo ndani ya Partials
+    $(document).on('click', '.pagination a', function(e){
+        e.preventDefault();
+        
+        let page = $(this).attr('href').split('page=')[1];
+        let role = $('.filter-btn.active').data('role') || ''; // Chukua role iliyopo active sasa hivi
+
+        loadUsers(role, page);
+    });
+});
+</script>
 
     </div>
 
@@ -735,6 +357,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 @endif
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 

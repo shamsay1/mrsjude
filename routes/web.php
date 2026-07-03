@@ -61,7 +61,11 @@ Route::post('/lesson-plan/comment', [LessonPlanController::class, 'saveComment']
     ->name('lesson-plan.comment');
 Route::post('/dailyrecord/comment', [LessonPlanController::class, 'saveComment'])
     ->name('dailyrecord.comment');
-    
+     Route::post('/lesson-plan/approve', [LessonPlanController::class, 'approve1'])
+        ->name('lessonplan.approve');
+
+    Route::post('/lesson-plan/reject', [LessonPlanController::class, 'reject'])
+        ->name('lessonplan.reject');
 
 
 

@@ -543,58 +543,110 @@ document.getElementById('topic_id')
     <div class="card-body">
 
         <!-- PRINT AREA -->
-        @if(Auth::user()->role =="headmaster")
-        <button
-    type="button"
-    class="btn btn-primary mb-3 mt-3"
-    data-bs-toggle="modal"
-    data-bs-target="#commentModal"
-    data-id="{{ $plan->id }}">
-    Add Comment
-</button>
+        @if(Auth::user()->role == "headmaster")
+
+    {{-- Approve --}}
+    <form action="{{ route('lessonplan.approve') }}" method="POST" class="d-inline">
+        @csrf
+        <input type="hidden" name="plan_id" value="{{ $plan->id }}">
+        <button type="submit" class="btn btn-success mb-3 mt-3">
+            <i class="fas fa-check"></i> Approve
+        </button>
+    </form>
+
+    {{-- Reject --}}
+    <button
+        type="button"
+        class="btn btn-danger mb-3 mt-3"
+        data-bs-toggle="modal"
+        data-bs-target="#commentModal"
+        data-id="{{ $plan->id }}">
+        <i class="fas fa-times"></i> Reject
+    </button>
+
 @endif
 
 @if($plan->status == "completed")
-    <span class="badge bg-success mb-3"
+    <span class="badge bg-success"
           style="cursor:pointer"
           data-bs-toggle="modal"
           data-bs-target="#commentsModal{{ $plan->id }}">
-        Reviewed by Headmaster
+        Approved
     </span>
-@else
-    <span class="badge bg-danger mb-3"
+
+@elseif($plan->status == "rejected")
+    <span class="badge bg-danger"
           style="cursor:pointer"
           data-bs-toggle="modal"
           data-bs-target="#commentsModal{{ $plan->id }}">
-        Not Reviewed
+        Rejected
+    </span>
+
+@else
+    <span class="badge bg-warning text-dark"
+          style="cursor:pointer"
+          data-bs-toggle="modal"
+          data-bs-target="#commentsModal{{ $plan->id }}">
+        Pending Review
     </span>
 @endif
 
 <!-- Modal -->
-<div class="modal fade" id="commentsModal{{ $plan->id }}" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="commentsModal{{ $plan->id }}" tabindex="-1" aria-labelledby="commentsModalLabel{{ $plan->id }}" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
 
             <div class="modal-header">
-                <h5 class="modal-title">
+
+                <h5 class="modal-title" id="commentsModalLabel{{ $plan->id }}">
                     @if($plan->status == "completed")
-                        Headmaster Comments
+                        <i class="fas fa-check-circle text-success"></i>
+                        Approved by Headmaster
+                    @elseif($plan->status == "rejected")
+                        <i class="fas fa-times-circle text-danger"></i>
+                        Rejection Comments
                     @else
-                        Review Comments
+                        <i class="fas fa-clock text-warning"></i>
+                        Review Status
                     @endif
                 </h5>
 
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
             </div>
 
             <div class="modal-body">
 
-                @if(!empty($plan->comments))
-                    <textarea class="form-control" rows="6" readonly>{{ $plan->comments }}</textarea>
-                @else
-                    <div class="alert alert-warning mb-0">
-                        No comments available.
+                @if($plan->status == "completed")
+
+                    <div class="alert alert-success mb-0">
+                        <strong>This lesson plan has been approved by the Headmaster.</strong>
                     </div>
+
+                @elseif($plan->status == "rejected")
+
+                    @if(!empty($plan->comments))
+
+                        <label class="form-label fw-bold">
+                            Headmaster's Comment
+                        </label>
+
+                        <textarea class="form-control" rows="6" readonly>{{ $plan->comments }}</textarea>
+
+                    @else
+
+                        <div class="alert alert-warning mb-0">
+                            No rejection comments available.
+                        </div>
+
+                    @endif
+
+                @else
+
+                    <div class="alert alert-secondary mb-0">
+                        This lesson plan has not yet been reviewed by the Headmaster.
+                    </div>
+
                 @endif
 
             </div>
@@ -610,7 +662,7 @@ document.getElementById('topic_id')
 </div>
 <div class="modal fade" id="commentModal" tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <form action="{{ route('lesson-plan.comment') }}" method="POST">
+        <form action="{{ route('lessonplan.reject') }}" method="POST">
             @csrf
 
             <input type="hidden" name="plan_id" id="plan_id">

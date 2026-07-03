@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\LessonPlan;
 use App\Models\Student;
 use App\Models\Subject;
@@ -72,6 +73,51 @@ public function saveComment(Request $request)
 
     return back()->with('success', 'All lesson plans for this teacher have been completed successfully.');
 }
+
+public function approve1(Request $request)
+{
+    $request->validate([
+        'plan_id' => 'required|exists:lesson_plans,id',
+    ]);
+
+    $plan = LessonPlan::findOrFail($request->plan_id);
+
+    $teacherId = Subject::findOrFail($plan->subject_id)->teacher_id;
+
+    $subjectIds = Subject::where('teacher_id', $teacherId)
+        ->pluck('id');
+
+    LessonPlan::whereIn('subject_id', $subjectIds)
+        ->update([
+            'status' => 'completed',
+            'comments' => null,
+        ]);
+
+    return back()->with('success','Lesson plans approved successfully.');
+}
+
+public function reject(Request $request)
+{
+    $request->validate([
+        'plan_id' => 'required|exists:lesson_plans,id',
+        'comment' => 'required|string',
+    ]);
+
+    $plan = LessonPlan::findOrFail($request->plan_id);
+
+    $teacherId = Subject::findOrFail($plan->subject_id)->teacher_id;
+
+    $subjectIds = Subject::where('teacher_id', $teacherId)
+        ->pluck('id');
+
+    LessonPlan::whereIn('subject_id', $subjectIds)
+        ->update([
+            'status' => 'rejected',
+            'comments' => $request->comment,
+        ]);
+
+    return back()->with('success','Lesson plans rejected successfully.');
+}
 public function getTopics($subjectId)
 {
     return Topic::where(
@@ -115,6 +161,16 @@ public function getSubTopics($topicId)
         'teaching_materials' => $request->teaching_materials,
         'status' => 'pending',
     ]);
+     ActivityLog::create([
+            
+            'module' => 'Lesson plan',
+            'action' => 'Upload lesson plan',
+            'description' => 'The teacher '.Auth::user()->firstname.' '.Auth::user()->middlename.' have upload lesson plan',
+            'ip_address' => $request->ip(),
+            'browser' => $request->header('User-Agent'),
+            'platform' => php_uname('s'),
+            'device' => $request->header('User-Agent'),
+        ]);
 
     return redirect()->back()
         ->with('success', 'Lesson Plan added successfully');

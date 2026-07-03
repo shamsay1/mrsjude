@@ -113,48 +113,52 @@ class UserController extends Controller
 }
     public function index(Request $request)
 {
-    $query = SystemUser::with([
-        'district',
-        'school'
-    ])->where('role', '!=', 'admin');
+    // 1. Tengeneza Query ya msingi ya system users
+    $query = SystemUser::with(['district', 'school'])->where('role', '!=', 'admin');
 
-    // FILTER BY ROLE
-    if ($request->role) {
-
-        $query->where('role', $request->role);
-    }
-
-    // FILTER BY DISTRICT
-    if ($request->district_id) {
-
+    // 2. Tenga filters za Request
+    if ($request->filled('district_id')) {
         $query->where('district_id', $request->district_id);
     }
 
-    // FILTER BY SCHOOL
-    if ($request->school_id) {
-
+    if ($request->filled('school_id')) {
         $query->where('school_id', $request->school_id);
     }
 
-    $users = $query->paginate(10);
-
-    $districts = District::all();
-    if(Auth::user()->role=="d_officer"){
-            $schools = School::where('district_id',Auth::user()->district_id)->get();
-            $users = $query->where('role','!=','d_officer')->latest()->get();
-        }
-    elseif(Auth::user()->role =="headmaster"){
-        $users = $query->where('role','teacher')->where('school_id',Auth::user()->school_id)->paginate(10);
-
+    if ($request->filled('role')) {
+        $query->where('role', $request->role);
     }
-    $schools = School::all();
-    
 
-    return view('users', compact(
-        'users',
-        'districts',
-        'schools'
-    ));
+    // 3. Logic ya ulinzi kulingana na Role ya aliyelogin (Auth::user)
+    $userRole = Auth::user()->role;
+
+    if ($userRole == "d_officer") {
+        $query->where('role', '!=', 'd_officer')
+              ->where('district_id', Auth::user()->district_id); // Filter watumiaji wa wilaya yake tu
+    } elseif ($userRole == "headmaster") {
+        $query->where('role', 'teacher')
+              ->where('school_id', Auth::user()->school_id);
+    }
+
+    // Paginate matokeo
+    $users = $query->latest()->paginate(10);
+
+    // 4. Kupata data za dropdowns (Districts na Schools)
+    $districts = District::all();
+
+    if ($userRole == "d_officer") {
+        $schools = School::where('district_id', Auth::user()->district_id)->get();
+    } else {
+        $schools = School::all();
+    }
+
+    // 5. Kama ni AJAX request (Pagination/Filters), rudisha partial view tu
+    if ($request->ajax()) {
+        return view('partials', compact('users', 'schools', 'districts'))->render();
+    }
+
+    // Kama ni page inafunguka kwa mara ya kwanza
+    return view('users', compact('users', 'districts', 'schools')); // Kumbuka jina la file liwe 'users' kama ulivyoweka hapa au badilisha kuwa 'user'
 }
 
     // Store
