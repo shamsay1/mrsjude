@@ -17,7 +17,8 @@ class LessonPlan extends Model
         'lesson_date',
         'class_room_id',
         'school_id',
-        'status'
+        'status',
+        'comments'
     ];
     public function subject()
     {

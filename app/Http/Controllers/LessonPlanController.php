@@ -42,6 +42,36 @@ class LessonPlanController extends Controller
         'total'
     ));
 }
+
+public function saveComment(Request $request)
+{
+    $request->validate([
+        'plan_id' => 'required|exists:lesson_plans,id',
+        'comment' => 'required|string',
+    ]);
+
+    // Lesson plan iliyochaguliwa
+    $plan = LessonPlan::findOrFail($request->plan_id);
+
+    // Hifadhi comment
+    $plan->comments = $request->comment;
+    $plan->save();
+
+    // Pata teacher_id kupitia subject
+    $teacherId = Subject::findOrFail($plan->subject_id)->teacher_id;
+
+    // Pata subject zote za mwalimu huyo
+    $subjectIds = Subject::where('teacher_id', $teacherId)
+        ->pluck('id');
+
+    // Update lesson plans zote za mwalimu huyo
+    LessonPlan::whereIn('subject_id', $subjectIds)
+        ->update([
+            'status' => 'completed'
+        ]);
+
+    return back()->with('success', 'All lesson plans for this teacher have been completed successfully.');
+}
 public function getTopics($subjectId)
 {
     return Topic::where(

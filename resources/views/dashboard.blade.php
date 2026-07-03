@@ -255,7 +255,41 @@
                         </table>
                     </div>
 
-                @else
+                     @elseif(Auth::user()->role == "headmaster")
+                     <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">
+                            <i class="fa fa-history me-2"></i>
+                            Recent Users
+                        </h5>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered align-middle">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>FIRSTNAME</th>
+                                    <th>PMIDDLENAME</th>
+                                    <th>LASTNAME</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($recentUsers as $key => $user)
+                                    <tr>
+                                        <td>{{ $key + 1 }}</td>
+                                        <td>{{ $user->firstname }}</td>
+                                        <td>{{ $user->middlename }}</td>
+                                        <td>{{ $user->lastname }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted">No recent workbook logs created yet.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                    @else
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="mb-0">
                             <i class="fa fa-users me-2"></i>

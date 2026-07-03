@@ -47,6 +47,11 @@
 
         </button>
         @endif
+        @if(Auth::user()->role == "supervisor" || Auth::user()->role == "headmaster")
+        <button class="btn btn-primary mb-3"><a href="/showtl" style="color: white;text-decoration: none">Back</a></button>
+
+
+        @endif
 
         <!-- Add Modal -->
         <div class="modal fade" id="addDailyRecordModal" tabindex="-1">

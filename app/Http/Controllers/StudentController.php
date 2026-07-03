@@ -12,7 +12,7 @@ class StudentController extends Controller
 {
      public function index()
     {
-        $students = Student::with('classRoom')->latest()->get();
+        $students = Student::with('classRoom')->where('school_id',Auth::user()->school_id)->latest()->get();
         $classes = ClassRoom::all();
 
         return view('student', compact(

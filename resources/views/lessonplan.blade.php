@@ -157,6 +157,11 @@
 
         </button>
         @endif
+         @if(Auth::user()->role =="supervisor" ||Auth::user()->role =="headmaster")
+    <a href="/showtl" class="btn btn-success text-white mt-3 mb-3" style="text-decoration: none;">
+        Back
+    </a>
+    @endif
 
         <!-- Add Modal -->
        <div class="modal fade" id="addLessonPlanModal" tabindex="-1">
@@ -538,6 +543,66 @@ document.getElementById('topic_id')
     <div class="card-body">
 
         <!-- PRINT AREA -->
+        @if(Auth::user()->role =="headmaster")
+        <button
+    type="button"
+    class="btn btn-primary mb-3 mt-3"
+    data-bs-toggle="modal"
+    data-bs-target="#commentModal"
+    data-id="{{ $plan->id }}">
+    Add Comment
+</button>
+@endif
+
+@if($plan->status =="completed")
+<span class="badge bg-success mb-3">Reviewed by headmaster</span>
+@else
+<span class="badge bg-danger mb-3">Not Reviewed</span>
+
+@endif
+<div class="modal fade" id="commentModal" tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="{{ route('lesson-plan.comment') }}" method="POST">
+            @csrf
+
+            <input type="hidden" name="plan_id" id="plan_id">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="commentModalLabel">Add Comment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label>Comment</label>
+                        <textarea
+                            name="comment"
+                            class="form-control"
+                            rows="5"
+                            placeholder="Write your comment here..."
+                            required></textarea>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Close
+                    </button>
+
+                    <button type="submit" class="btn btn-success">
+                        Save Comment
+                    </button>
+                </div>
+
+            </div>
+
+        </form>
+    </div>
+</div>
         <div class="lesson-paper" id="printableArea{{ $plan->id }}">
 
             <h2>LESSON PLAN</h2>
@@ -710,6 +775,7 @@ document.getElementById('topic_id')
         Manage Stages
 
     </button>
+       @if(Auth::user()->role =="teacher")
             <button class="btn btn-primary"
                 data-bs-toggle="modal"
                 data-bs-target="#editLessonPlan{{ $plan->id }}">
@@ -733,6 +799,8 @@ document.getElementById('topic_id')
                 </button>
 
             </form>
+
+            @endif
 
             <button class="btn btn-dark"
                 onclick="printLessonPlan('printableArea{{ $plan->id }}')">
@@ -936,11 +1004,7 @@ document.getElementById('topic_id')
         @endif
     </tbody>
 </table>
- @if(Auth::user()->role =="supervisor")
-    <a href="/showtl" class="btn btn-success text-white" style="text-decoration: none;">
-        Back
-    </a>
-    @endif
+
     </div>
 
 </div>
@@ -1042,6 +1106,23 @@ function printLessonPlan(id){
 
 }
 
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const commentModal = document.getElementById('commentModal');
+
+    commentModal.addEventListener('show.bs.modal', function (event) {
+
+        const button = event.relatedTarget;
+        const planId = button.getAttribute('data-id');
+
+        document.getElementById('plan_id').value = planId;
+
+    });
+
+});
 </script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {

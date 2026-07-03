@@ -57,6 +57,8 @@ Route::get('/supervisor/student-performance-report', [SupervisorController::clas
 Route::middleware(['auth','headmaster'])->group(function(){
 Route::resource('school-class', ClassRoomController::class);
 Route::resource('student', StudentController::class);
+Route::post('/lesson-plan/comment', [LessonPlanController::class, 'saveComment'])
+    ->name('lesson-plan.comment');
 
 
 

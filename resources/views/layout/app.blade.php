@@ -291,7 +291,7 @@ body {
 
 </a>
 <a href="{{ route('showtl') }}" class="{{ request()->routeIs('showtl') ? 'active' : '' }}">
-    <i class="bi bi-person-gear"></i> <span>View Teachers</span>
+    <i class="bi bi-person-gear"></i> <span>View workbooks</span>
 </a>
 <a href="{{ route('adminsil') }}" class="{{ request()->routeIs('showtl') ? 'active' : '' }}">
     <i class="bi bi-person-gear"></i> <span>View report</span>
