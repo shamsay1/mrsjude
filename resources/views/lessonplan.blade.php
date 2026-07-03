@@ -554,12 +554,60 @@ document.getElementById('topic_id')
 </button>
 @endif
 
-@if($plan->status =="completed")
-<span class="badge bg-success mb-3">Reviewed by headmaster</span>
+@if($plan->status == "completed")
+    <span class="badge bg-success mb-3"
+          style="cursor:pointer"
+          data-bs-toggle="modal"
+          data-bs-target="#commentsModal{{ $plan->id }}">
+        Reviewed by Headmaster
+    </span>
 @else
-<span class="badge bg-danger mb-3">Not Reviewed</span>
-
+    <span class="badge bg-danger mb-3"
+          style="cursor:pointer"
+          data-bs-toggle="modal"
+          data-bs-target="#commentsModal{{ $plan->id }}">
+        Not Reviewed
+    </span>
 @endif
+
+<!-- Modal -->
+<div class="modal fade" id="commentsModal{{ $plan->id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    @if($plan->status == "completed")
+                        Headmaster Comments
+                    @else
+                        Review Comments
+                    @endif
+                </h5>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                @if(!empty($plan->comments))
+                    <textarea class="form-control" rows="6" readonly>{{ $plan->comments }}</textarea>
+                @else
+                    <div class="alert alert-warning mb-0">
+                        No comments available.
+                    </div>
+                @endif
+
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">
+                    Close
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="commentModal" tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <form action="{{ route('lesson-plan.comment') }}" method="POST">

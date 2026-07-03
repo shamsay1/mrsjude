@@ -247,6 +247,63 @@
                                     <td>
                                         {{ $record->remarks }}
                                     </td>
+                                    @if(Auth::user()->role=="headmaster")
+             <td>
+                <button
+    type="button"
+    class="btn btn-primary mb-3 mt-3"
+    data-bs-toggle="modal"
+    data-bs-target="#commentModal"
+    data-id="{{ $record->id }}">
+    Add Comment
+</button>
+<div class="modal fade" id="commentModal" tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="{{ route('dailyrecord.comment') }}" method="POST">
+            @csrf
+
+            <input type="hidden" name="record_id" id="record_id">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Comment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label>Comment</label>
+                        <textarea
+                            name="comment"
+                            class="form-control"
+                            rows="5"
+                            placeholder="Write your comment here..."
+                            required></textarea>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Close
+                    </button>
+
+                    <button type="submit" class="btn btn-success">
+                        Save Comment
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+    </div>
+</div>
+             </td>
+                                    @endif
         @if(Auth::user()->role =="teacher")
 
                                     <td>
@@ -299,6 +356,21 @@
     </div>
 
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const commentModal = document.getElementById('commentModal');
+
+    commentModal.addEventListener('show.bs.modal', function (event) {
+
+        const button = event.relatedTarget;
+
+        document.getElementById('record_id').value = button.getAttribute('data-id');
+
+    });
+
+});
+</script>
 <script>
 
 document.addEventListener('DOMContentLoaded', function(){
@@ -441,5 +513,16 @@ document.addEventListener('DOMContentLoaded', function(){
 
 });
 </script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@if(session('success'))
+<script>
+Swal.fire({
+    icon: 'success',
+    title: 'Success!',
+    text: '{{ session('success') }}',
+    confirmButtonText: 'OK'
+});
+</script>
+@endif
 {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> --}}
 @endsection

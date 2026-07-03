@@ -59,6 +59,9 @@ Route::resource('school-class', ClassRoomController::class);
 Route::resource('student', StudentController::class);
 Route::post('/lesson-plan/comment', [LessonPlanController::class, 'saveComment'])
     ->name('lesson-plan.comment');
+Route::post('/dailyrecord/comment', [LessonPlanController::class, 'saveComment'])
+    ->name('dailyrecord.comment');
+    
 
 
 

@@ -144,7 +144,7 @@ class UserController extends Controller
             $users = $query->where('role','!=','d_officer')->latest()->get();
         }
     elseif(Auth::user()->role =="headmaster"){
-        $users = $query->where('role','teacher')->where('school_id',Auth::user()->school_id)->latest()->get();
+        $users = $query->where('role','teacher')->where('school_id',Auth::user()->school_id)->paginate(10);
 
     }
     $schools = School::all();

@@ -43,14 +43,34 @@
 
                                 <div class="col-md-6 mb-3">
 
-                                    <label>Class Name</label>
+    @php
+        $classNames = [
+            'Form One',
+            'Form Two',
+            'Form Three',
+            'Form Four'
+        ];
+    @endphp
 
-                                    <input type="text"
-                                        name="class_name"
-                                        class="form-control"
-                                        placeholder="Enter class name">
+    <label>Class Name</label>
 
-                                </div>
+    <input
+        type="text"
+        name="class_name"
+        class="form-control"
+        placeholder="Enter class name"
+        list="classList"
+        autocomplete="off"
+        value="{{ old('class_name') }}"
+        required>
+
+    <datalist id="classList">
+        @foreach($classNames as $className)
+            <option value="{{ $className }}"></option>
+        @endforeach
+    </datalist>
+
+</div>
 
                                 <div class="col-md-6 mb-3">
 

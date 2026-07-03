@@ -100,37 +100,33 @@ class SubjectController extends Controller
             ->with('error', $e->getMessage());
     }
 }
-    // Update Data
     public function update(Request $request, $id)
-    {
-        $request->validate([
-            'subjectName' => 'required',
-            'subjectCode' => 'required',
-            'class_room_id' => 'required',
-            'teacher_id' => 'required'
-        ]);
+{
+    $request->validate([
+        'subjectName' => 'required|string|max:255',
+        'subjectCode' => 'required|string|max:100',
+        'class_room_id' => 'required|exists:class_rooms,id',
+        'teacher_id' => 'required|exists:system_users,id',
+    ]);
 
-        $subject = Subject::findOrFail($id);
+    $subject = Subject::findOrFail($id);
 
-        $subject->update([
-            'subjectName' => strtoupper($request->subjectName),
-            'subjectCode' => $request->subjectCode,
-            'class_room_id' => $request->class_room_id,
-            'teacher_id' => $request->teacher_id
-        ]);
+    $subject->update([
+        'subjectName' => $request->subjectName,
+        'subjectCode' => $request->subjectCode,
+        'class_room_id' => $request->class_room_id,
+        'teacher_id' => $request->teacher_id,
+    ]);
 
-        return redirect()->back()
-            ->with('success', 'Subject updated successfully');
-    }
+    return redirect()->back()->with('success', 'Subject updated successfully.');
+}
 
-    // Delete Data
     public function destroy($id)
-    {
-        $subject = Subject::findOrFail($id);
+{
+    $subject = Subject::findOrFail($id);
 
-        $subject->delete();
+    $subject->delete();
 
-        return redirect()->back()
-            ->with('success', 'Subject deleted successfully');
-    }
+    return redirect()->back()->with('success', 'Subject deleted successfully.');
+}
 }

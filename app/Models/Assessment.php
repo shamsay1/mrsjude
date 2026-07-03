@@ -31,7 +31,8 @@ class Assessment extends Model
         'topictest2',
         'topictest3',
 
-        'terminal_exam'
+        'terminal_exam',
+        'status'
     ];
 
     /**

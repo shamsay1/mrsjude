@@ -101,7 +101,25 @@ class DailyRecordController extends Controller
         'records',
         'teachers',
         'schools',
-        'subjects'
+        'subjects',
+        
     ));
+}
+
+    public function saveComment(Request $request)
+{
+    $request->validate([
+        'record_id' => 'required|exists:daily_recordings,id',
+        'comment'   => 'required|string',
+    ]);
+
+    $record = DailyRecording::findOrFail($request->record_id);
+
+    $record->update([
+        'comments' => $request->comment,
+        'status'   => 'completed',
+    ]);
+
+    return redirect()->back()->with('success', 'Comment added successfully.');
 }
 }

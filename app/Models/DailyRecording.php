@@ -17,6 +17,8 @@ class DailyRecording extends Model
         'work_done_by_teacher',
         'work_done_by_student',
         'remarks',
+        'status',
+        'comments'
     ];
 
      public function teacher()
