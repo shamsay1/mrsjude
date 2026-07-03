@@ -766,8 +766,10 @@ document.getElementById('topic_id')
         </div>
 
         <!-- BUTTONS -->
-
+        
         <div class="mt-4 no-print">
+       @if(Auth::user()->role =="teacher")
+
             <button class="btn btn-success"
         data-bs-toggle="modal"
         data-bs-target="#stageModal{{ $plan->id }}">
@@ -775,6 +777,7 @@ document.getElementById('topic_id')
         Manage Stages
 
     </button>
+    @endif
        @if(Auth::user()->role =="teacher")
             <button class="btn btn-primary"
                 data-bs-toggle="modal"
