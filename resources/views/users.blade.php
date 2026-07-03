@@ -643,6 +643,9 @@
             </tbody>
 
         </table>
+        <div class="mt-3" id="paginationLinks">
+        {{ $users->links() }}
+    </div>
 
     </div>
 

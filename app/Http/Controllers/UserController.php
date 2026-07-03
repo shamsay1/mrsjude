@@ -136,7 +136,7 @@ class UserController extends Controller
         $query->where('school_id', $request->school_id);
     }
 
-    $users = $query->latest()->get();
+    $users = $query->paginate(10);
 
     $districts = District::all();
     if(Auth::user()->role=="d_officer"){
