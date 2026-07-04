@@ -68,22 +68,52 @@
         <div class="tab-pane fade" id="change-password" role="tabpanel" aria-labelledby="change-password-tab">
             <div class="card p-3" style="border-radius: 3px">
                 <h5>Change Password</h5>
-                <form action="" method="POST">
-                    @csrf
-                    <div class="mb-3">
-                        <label for="current_password" class="form-label">Current Password</label>
-                        <input type="password" name="current_password" id="current_password" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="new_password" class="form-label">New Password</label>
-                        <input type="password" name="new_password" id="new_password" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="new_password_confirmation" class="form-label">Confirm New Password</label>
-                        <input type="password" name="new_password_confirmation" id="new_password_confirmation" class="form-control" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Change Password</button>
-                </form>
+                <form action="{{ route('change.password') }}" method="POST">
+    @csrf
+
+    <div class="mb-3">
+        <label class="form-label">Current Password</label>
+
+        <input
+            type="password"
+            name="current_password"
+            class="form-control"
+            required>
+
+        @error('current_password')
+            <small class="text-danger">{{ $message }}</small>
+        @enderror
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">New Password</label>
+
+        <input
+            type="password"
+            name="new_password"
+            class="form-control"
+            required>
+
+        @error('new_password')
+            <small class="text-danger">{{ $message }}</small>
+        @enderror
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Confirm New Password</label>
+
+        <input
+            type="password"
+            name="new_password_confirmation"
+            class="form-control"
+            required>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        <i class="bi bi-key-fill"></i> Change Password
+    </button>
+
+</form>
             </div>
         </div>
     </div>
@@ -91,6 +121,90 @@
     </div>
 
 </div>
+@if(session('success') || session('error'))
 
+<div class="modal fade" id="successModal" tabindex="-1">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content text-center">
+
+            @if(session('success'))
+
+                <div class="modal-body p-5">
+
+                    <i class="fas fa-check-circle text-success"
+                       style="font-size:80px;"></i>
+
+                    <h3 class="mt-3 text-success">
+                        Success
+                    </h3>
+
+                    <p style="color:green">
+                        {{ session('success') }}
+                    </p>
+
+                    <button type="button"
+                            class="btn btn-success"
+                            data-bs-dismiss="modal">
+                        OK
+                    </button>
+
+                </div>
+
+            @endif
+
+            @if(session('error') || $errors->any())
+
+<div class="modal-body p-5">
+
+    <i class="fas fa-times-circle text-danger"
+       style="font-size:80px;"></i>
+
+    <h3 class="mt-3 text-danger">
+        Failed
+    </h3>
+
+    @if(session('error'))
+        <p style="color:red">
+            {{ session('error') }}
+        </p>
+    @endif
+
+    @if($errors->any())
+        <ul class="text-danger text-start">
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    @endif
+
+    <button type="button"
+            class="btn btn-danger"
+            data-bs-dismiss="modal">
+        OK
+    </button>
+
+</div>
+
+@endif
+
+        </div>
+
+    </div>
+
+</div>
+
+@endif
+@if(session('success') || session('error'))
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    let modal = new bootstrap.Modal(
+        document.getElementById('successModal')
+    );
+    modal.show();
+});
+</script>
+@endif
 {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> --}}
 @endsection

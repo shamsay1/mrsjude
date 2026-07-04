@@ -200,6 +200,7 @@
         <th>
             Remarks
         </th>
+        <th>Status</th>
 
         @if(Auth::user()->role == "teacher")
         <th>
@@ -247,19 +248,121 @@
                                     <td>
                                         {{ $record->remarks }}
                                     </td>
-                                    @if(Auth::user()->role=="headmaster")
-             <td>
-                <button
+                                  <td>
+
+<button
     type="button"
-    class="btn btn-primary mb-3 mt-3"
+    class="btn btn-sm
+        @if($record->status == 'pending')
+            btn-warning
+        @elseif($record->status == 'completed')
+            btn-success
+        @else
+            btn-danger
+        @endif"
     data-bs-toggle="modal"
-    data-bs-target="#commentModal"
-    data-id="{{ $record->id }}">
-    Add Comment
+    data-bs-target="#statusModal"
+    data-status="{{ $record->status }}"
+    data-comment="{{ $record->comments }}">
+
+    @if($record->status == 'pending')
+        <i class="bi bi-hourglass-split"></i> Pending
+    @elseif($record->status == 'completed')
+        <i class="bi bi-check-circle-fill"></i> Completed
+    @elseif($record->status == 'rejected')
+        <i class="bi bi-x-circle-fill"></i> Rejected
+    @endif
+
 </button>
-<div class="modal fade" id="commentModal" tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
+
+</td>
+<div class="modal fade" id="statusModal" tabindex="-1">
+
     <div class="modal-dialog">
-        <form action="{{ route('dailyrecord.comment') }}" method="POST">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    Daily Record Status
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+    <p>
+        <strong>Status:</strong>
+        <span id="modalStatus"></span>
+    </p>
+
+    <div id="commentSection">
+
+        <hr>
+
+        <p>
+            <strong>Comment:</strong>
+        </p>
+
+        <div
+            id="modalComment"
+            class="border rounded p-3 bg-light">
+        </div>
+
+    </div>
+
+</div>
+
+        </div>
+
+    </div>
+
+</div>
+                                    @if(Auth::user()->role=="headmaster")
+<td>
+
+    {{-- Approve --}}
+    <form action="{{ route('dailyrecord.approve') }}" method="POST" class="d-inline">
+        @csrf
+        <input type="hidden" name="record_id" value="{{ $record->id }}">
+
+        <button
+            type="submit"
+            class="btn btn-success btn-sm"
+            onclick="return confirm('Approve this Daily Record?')">
+
+            <i class="bi bi-check-circle-fill"></i>
+
+        </button>
+
+    </form>
+
+    {{-- Reject --}}
+    <button
+        type="button"
+        class="btn btn-danger btn-sm"
+        data-bs-toggle="modal"
+        data-bs-target="#rejectModal"
+        data-id="{{ $record->id }}">
+
+        <i class="bi bi-x-circle-fill"></i>
+
+    </button>
+
+</td>
+<div class="modal fade" id="rejectModal" tabindex="-1">
+
+    <div class="modal-dialog">
+
+        <form action="{{ route('dailyrecord.reject') }}" method="POST">
+
             @csrf
 
             <input type="hidden" name="record_id" id="record_id">
@@ -267,32 +370,49 @@
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <h5 class="modal-title">Add Comment</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+                    <h5 class="modal-title">
+                        Reject Daily Record
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                    </button>
+
                 </div>
 
                 <div class="modal-body">
 
-                    <div class="mb-3">
-                        <label>Comment</label>
-                        <textarea
-                            name="comment"
-                            class="form-control"
-                            rows="5"
-                            placeholder="Write your comment here..."
-                            required></textarea>
-                    </div>
+                    <label>Comment</label>
+
+                    <textarea
+                        class="form-control"
+                        name="comment"
+                        rows="5"
+                        required
+                        placeholder="Write reason for rejection"></textarea>
 
                 </div>
 
                 <div class="modal-footer">
 
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+
                         Close
+
                     </button>
 
-                    <button type="submit" class="btn btn-success">
-                        Save Comment
+                    <button
+                        type="submit"
+                        class="btn btn-danger">
+
+                        Reject
+
                     </button>
 
                 </div>
@@ -300,10 +420,11 @@
             </div>
 
         </form>
+
     </div>
+
 </div>
-             </td>
-                                    @endif
+@endif
         @if(Auth::user()->role =="teacher")
 
                                     <td>
@@ -359,13 +480,61 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-    const commentModal = document.getElementById('commentModal');
+    const modal = document.getElementById('statusModal');
 
-    commentModal.addEventListener('show.bs.modal', function (event) {
+    modal.addEventListener('show.bs.modal', function (event) {
 
         const button = event.relatedTarget;
 
-        document.getElementById('record_id').value = button.getAttribute('data-id');
+        const status = button.getAttribute('data-status');
+        const comment = button.getAttribute('data-comment');
+
+        let badge = '';
+
+        if (status === 'pending') {
+
+            badge = '<span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split"></i> Pending</span>';
+
+            document.getElementById('commentSection').style.display = 'block';
+
+        } else if (status === 'completed') {
+
+            badge = '<span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> Completed</span>';
+
+            // Ficha comment kabisa
+            document.getElementById('commentSection').style.display = 'none';
+
+        } else {
+
+            badge = '<span class="badge bg-danger"><i class="bi bi-x-circle-fill"></i> Rejected</span>';
+
+            document.getElementById('commentSection').style.display = 'block';
+
+        }
+
+        document.getElementById('modalStatus').innerHTML = badge;
+
+        document.getElementById('modalComment').innerHTML =
+            comment && comment.trim() !== ''
+                ? comment
+                : '<span class="text-muted">No comment available.</span>';
+
+    });
+
+});
+</script>
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+
+    const rejectModal = document.getElementById('rejectModal');
+
+    rejectModal.addEventListener('show.bs.modal', function (event) {
+
+        const button = event.relatedTarget;
+
+        const id = button.getAttribute('data-id');
+
+        document.getElementById('record_id').value = id;
 
     });
 

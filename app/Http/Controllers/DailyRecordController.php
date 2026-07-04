@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\DailyRecording;
 use App\Models\School;
 use App\Models\Subject;
@@ -65,6 +66,16 @@ class DailyRecordController extends Controller
             'work_done_by_student' => $request->work_done_by_student,
             'remarks' => $request->remarks
         ]);
+         ActivityLog::create([
+            
+            'module' => 'Daily Recording',
+            'action' => 'Upload daily recording',
+            'description' => 'The teacher '.Auth::user()->firstname.' '.Auth::user()->middlename.' have upload daily record',
+            'ip_address' => $request->ip(),
+            'browser' => $request->header('User-Agent'),
+            'platform' => php_uname('s'),
+            'device' => $request->header('User-Agent'),
+        ]);
 
         return redirect()->back()
             ->with('success', 'Daily Record Added Successfully');
@@ -106,20 +117,35 @@ class DailyRecordController extends Controller
     ));
 }
 
-    public function saveComment(Request $request)
+    public function approveDailyRecord(Request $request)
 {
     $request->validate([
         'record_id' => 'required|exists:daily_recordings,id',
-        'comment'   => 'required|string',
     ]);
 
     $record = DailyRecording::findOrFail($request->record_id);
 
     $record->update([
-        'comments' => $request->comment,
-        'status'   => 'completed',
+        'status' => 'completed',
     ]);
 
-    return redirect()->back()->with('success', 'Comment added successfully.');
+    return back()->with('success', 'Daily record approved successfully.');
+}
+
+public function rejectDailyRecord(Request $request)
+{
+    $request->validate([
+        'record_id' => 'required|exists:daily_recordings,id',
+        'comment' => 'required|string',
+    ]);
+
+    $record = DailyRecording::findOrFail($request->record_id);
+
+    $record->update([
+        'status' => 'rejected',
+        'comments' => $request->comment,
+    ]);
+
+    return back()->with('success', 'Daily record rejected successfully.');
 }
 }

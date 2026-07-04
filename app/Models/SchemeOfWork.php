@@ -22,7 +22,8 @@ class SchemeOfWork extends Model
         'assessment_tool',
         'reference',
         'remarks',
-        'status'
+        'status',
+        'comments'
     ];
 
     public function subject()

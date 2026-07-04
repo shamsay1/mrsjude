@@ -20,6 +20,8 @@ Route::get("/",[LoginController::class,"showlogin"])->name('login');
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [UserController::class, 'dashboard'])
         ->name('dashboard');
+        Route::post('/change-password', [UserController::class, 'changePassword'])
+    ->name('change.password');
 Route::get('/admin/syllabus-report', [SupervisorController::class, 'adminSyllabusReport'])->name("adminsil");
 Route::resource('system-user', UserController::class);
 Route::resource('subject', SubjectController::class);
@@ -59,8 +61,17 @@ Route::resource('school-class', ClassRoomController::class);
 Route::resource('student', StudentController::class);
 Route::post('/lesson-plan/comment', [LessonPlanController::class, 'saveComment'])
     ->name('lesson-plan.comment');
-Route::post('/dailyrecord/comment', [LessonPlanController::class, 'saveComment'])
-    ->name('dailyrecord.comment');
+Route::post('/dailyrecord/approve', [DailyRecordController::class, 'approveDailyRecord'])
+    ->name('dailyrecord.approve');
+
+    Route::post('/scheme/approve',[SchemeOfWorkController::class,'approveScheme'])
+    ->name('scheme.approve');
+
+Route::post('/scheme/reject',[SchemeOfWorkController::class,'rejectScheme'])
+    ->name('scheme.reject');
+
+Route::post('/dailyrecord/reject', [DailyRecordController::class, 'rejectDailyRecord'])
+    ->name('dailyrecord.reject');
      Route::post('/lesson-plan/approve', [LessonPlanController::class, 'approve1'])
         ->name('lessonplan.approve');
 

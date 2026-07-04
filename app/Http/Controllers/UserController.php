@@ -161,6 +161,46 @@ class UserController extends Controller
     return view('users', compact('users', 'districts', 'schools')); // Kumbuka jina la file liwe 'users' kama ulivyoweka hapa au badilisha kuwa 'user'
 }
 
+    public function changePassword(Request $request)
+{
+    $request->validate([
+        'current_password' => 'required',
+        'new_password' => 'required|min:4|confirmed',
+    ]);
+
+    $user = SystemUser::find(Auth::id());
+
+    if (!$user) {
+        return back()->withErrors([
+            'current_password' => 'User not found.'
+        ]);
+    }
+
+    // Password ya sasa
+    if (!Hash::check($request->current_password, $user->password)) {
+
+        return back()->withErrors([
+            'current_password' => 'Current password is incorrect.'
+        ]);
+
+    }
+
+    // Hairuhusu kutumia password ile ile
+    if (Hash::check($request->new_password, $user->password)) {
+
+        return back()->withErrors([
+            'new_password' => 'New password must be different from current password.'
+        ]);
+
+    }
+
+    SystemUser::where('id', Auth::id())->update([
+        'password' => Hash::make($request->new_password),
+    ]);
+
+    return back()->with('success', 'Password changed successfully.');
+}
+
     // Store
  public function store(Request $request)
 {

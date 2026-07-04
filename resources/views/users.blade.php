@@ -1,5 +1,18 @@
 @extends("layout.app")
+<style>
+    .filter-btn{
+    transition: all .25s ease;
+    margin-right:5px;
+}
 
+.filter-btn.active{
+    color:#fff;
+}
+
+.btn-outline-warning.active{
+    color:#000;
+}
+</style>
 @section("content")
 
 <div class="content" id="content">
@@ -187,22 +200,31 @@
         <form method="GET" action="{{ route('system-user.index') }}">
 
     <div class="mb-3">
-    <!-- Hakikisha kuna type="button" kwenye kila button -->
-    <button type="button" class="btn btn-primary filter-btn active" data-role="">
+
+    <button type="button"
+        class="btn btn-outline-primary filter-btn active"
+        data-role="">
         All
     </button>
 
-    <button type="button" class="btn btn-success filter-btn" data-role="headmaster">
+    <button type="button"
+        class="btn btn-outline-success filter-btn"
+        data-role="headmaster">
         Headmaster
     </button>
 
-    <button type="button" class="btn btn-info text-white filter-btn" data-role="teacher">
+    <button type="button"
+        class="btn btn-outline-info filter-btn"
+        data-role="teacher">
         Teacher
     </button>
 
-    <button type="button" class="btn btn-warning filter-btn" data-role="supervisor">
+    <button type="button"
+        class="btn btn-outline-warning filter-btn"
+        data-role="supervisor">
         Supervisor
     </button>
+
 </div>
 
     

@@ -480,6 +480,10 @@
             <th>Assessment Tools</th>
             <th>Reference</th>
             <th>Remarks</th>
+            <th>Status</th>
+             @if(Auth::user()->role=="headmaster")
+        <th>Action</th>
+        @endif
         </tr>
     </thead>
 
@@ -512,6 +516,83 @@
             <td>{{ $scheme->reference }}</td>
 
             <td>{{ $scheme->remarks }}</td>
+   <td>
+
+<button
+    type="button"
+    class="btn btn-sm
+    @if($scheme->status == 'pending')
+        btn-warning
+    @elseif($scheme->status == 'completed')
+        btn-success
+    @elseif($scheme->status == 'rejected')
+        btn-danger
+    @else
+        btn-secondary
+    @endif"
+    data-bs-toggle="modal"
+    data-bs-target="#schemeStatusModal"
+    data-status="{{ $scheme->status }}"
+    data-comment="{{ $scheme->comments }}">
+
+    @if($scheme->status == 'pending')
+
+        <i class="bi bi-hourglass-split"></i> Pending
+
+    @elseif($scheme->status == 'completed')
+
+        <i class="bi bi-check-circle-fill"></i> Completed
+
+    @elseif($scheme->status == 'rejected')
+
+        <i class="bi bi-x-circle-fill"></i> Rejected
+
+    @else
+
+        <i class="bi bi-question-circle-fill"></i> {{ ucfirst($scheme->status) }}
+
+    @endif
+
+</button>
+
+</td>
+
+            @if(Auth::user()->role=="headmaster")
+
+<td>
+
+    {{-- Approve --}}
+    <form action="{{ route('scheme.approve') }}" method="POST" class="d-inline">
+
+        @csrf
+
+        <input type="hidden" name="scheme_id" value="{{ $scheme->id }}">
+
+        <button
+            class="btn btn-success btn-sm"
+            onclick="return confirm('Approve this Scheme of Work?')">
+
+            <i class="bi bi-check-circle-fill"></i>
+
+        </button>
+
+    </form>
+
+    {{-- Reject --}}
+    <button
+        class="btn btn-danger btn-sm"
+        data-bs-toggle="modal"
+        data-bs-target="#rejectSchemeModal"
+        data-id="{{ $scheme->id }}">
+
+        <i class="bi bi-x-circle-fill"></i>
+
+    </button>
+
+</td>
+
+@endif
+
 
 
         </tr>
@@ -521,12 +602,196 @@
     </tbody>
 
 </table>
+<div class="modal fade" id="schemeStatusModal" tabindex="-1">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">Scheme of Work Status</h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <p>
+                    <strong>Status:</strong>
+                    <span id="schemeModalStatus"></span>
+                </p>
+
+                <div id="schemeCommentSection">
+
+                    <hr>
+
+                    <strong>Comment</strong>
+
+                    <div
+                        id="schemeModalComment"
+                        class="border rounded p-3 bg-light mt-2">
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+<div class="modal fade" id="rejectSchemeModal" tabindex="-1">
+
+    <div class="modal-dialog">
+
+        <form action="{{ route('scheme.reject') }}" method="POST">
+
+            @csrf
+
+            <input type="hidden" name="scheme_id" id="scheme_id">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title">
+                        Reject Scheme of Work
+                    </h5>
+
+                    <button
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <label>Comment</label>
+
+                    <textarea
+                        class="form-control"
+                        name="comment"
+                        rows="5"
+                        required
+                        placeholder="Write reason for rejection"></textarea>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+
+                        Close
+
+                    </button>
+
+                    <button
+                        class="btn btn-danger">
+
+                        Reject
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
 
 </div>
 
     </div>
 
 </div>
+<script>
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    const modal = document.getElementById('schemeStatusModal');
+
+    modal.addEventListener('show.bs.modal', function (event) {
+
+        const button = event.relatedTarget;
+
+        const status = button.getAttribute('data-status');
+        const comment = button.getAttribute('data-comment');
+
+        let badge = '';
+
+        if (status === 'pending') {
+
+            badge = '<span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split"></i> Pending</span>';
+
+            document.getElementById('schemeCommentSection').style.display = 'block';
+
+        } else if (status === 'completed') {
+
+            badge = '<span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> Completed</span>';
+
+            // Completed haina comment
+            document.getElementById('schemeCommentSection').style.display = 'none';
+
+        } else if (status === 'rejected') {
+
+            badge = '<span class="badge bg-danger"><i class="bi bi-x-circle-fill"></i> Rejected</span>';
+
+            document.getElementById('schemeCommentSection').style.display = 'block';
+
+        } else {
+
+            badge = '<span class="badge bg-secondary">' + status + '</span>';
+
+            document.getElementById('schemeCommentSection').style.display = 'none';
+
+        }
+
+        document.getElementById('schemeModalStatus').innerHTML = badge;
+
+        document.getElementById('schemeModalComment').innerHTML =
+            comment && comment.trim() !== ''
+                ? comment
+                : '<span class="text-muted">No comment available.</span>';
+
+    });
+
+});
+
+</script>
+<script>
+
+document.addEventListener('DOMContentLoaded',function(){
+
+    const modal=document.getElementById('rejectSchemeModal');
+
+    modal.addEventListener('show.bs.modal',function(event){
+
+        const button=event.relatedTarget;
+
+        const id=button.getAttribute('data-id');
+
+        document.getElementById('scheme_id').value=id;
+
+    });
+
+});
+
+</script>
 <script>
 
 document.addEventListener('DOMContentLoaded', function(){
