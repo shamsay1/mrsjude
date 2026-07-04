@@ -8,50 +8,79 @@
             <h5><i class="fa fa-filter"></i> Filter Syllabus Report</h5>
         </div>
         <div class="card-body">
-            <form action="{{ url('/admin/syllabus-report') }}" method="GET" class="row g-3">
-                
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Select School:</label>
-                    <select name="school_id" id="school_id" class="form-select" required>
-                        <option value="">-- Choose School --</option>
-                        @foreach(\DB::table('schools')->get() as $school)
-                            <option value="{{ $school->id }}" {{ request('school_id') == $school->id ? 'selected' : '' }} data-name="{{ $school->school_name }}">
-                                {{ $school->school_name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+            @php
+$subjects = DB::table('subjects')
+    ->join('class_rooms', 'subjects.class_room_id', '=', 'class_rooms.id')
+    ->select(
+        'subjects.id',
+        'subjects.subjectName',
+        'class_rooms.class_name'
+    )
+    ->orderBy('class_rooms.class_name')
+    ->orderBy('subjects.subjectName')
+    ->get();
+@endphp
 
-                <div class="col-md-3">
-                    <label class="form-label fw-bold">Select Class:</label>
-                    <select name="class_id" id="class_id" class="form-select" required>
-                        <option value="">-- Choose Class --</option>
-                        @foreach(\DB::table('class_rooms')->get() as $class)
-                            <option value="{{ $class->id }}" {{ request('class_id') == $class->id ? 'selected' : '' }} data-name="{{ $class->class_name }}">
-                                {{ $class->class_name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+<form action="{{ url('/admin/syllabus-report') }}" method="GET" class="row g-3">
 
-                <div class="col-md-3">
-                    <label class="form-label fw-bold">Select Subject:</label>
-                    <select name="subject_id" id="subject_id" class="form-select" required>
-                        <option value="">-- Choose Subject --</option>
-                        @foreach(\DB::table('subjects')->get() as $sub)
-                            <option value="{{ $sub->id }}" {{ request('subject_id') == $sub->id ? 'selected' : '' }} data-name="{{ $sub->subjectName }}">
-                                {{ $sub->subjectName }} 
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+    <div class="col-md-4">
+        <label class="form-label fw-bold">Select School</label>
 
-                <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-100 py-2">
-                        <i class="fa fa-search"></i> Search
-                    </button>
-                </div>
-            </form>
+        <select name="school_id" class="form-select" required>
+
+            <option value="">-- Choose School --</option>
+
+            @foreach(DB::table('schools')->get() as $school)
+
+                <option value="{{ $school->id }}"
+                    {{ request('school_id') == $school->id ? 'selected' : '' }}>
+
+                    {{ $school->school_name }}
+
+                </option>
+
+            @endforeach
+
+        </select>
+
+    </div>
+
+
+    <div class="col-md-6">
+
+        <label class="form-label fw-bold">Select Subject</label>
+
+        <select name="subject_id" class="form-select" required>
+
+            <option value="">-- Choose Subject --</option>
+
+            @foreach($subjects as $sub)
+
+                <option value="{{ $sub->id }}"
+                    {{ request('subject_id') == $sub->id ? 'selected' : '' }}>
+
+                    {{ $sub->subjectName }} - {{ $sub->class_name }}
+
+                </option>
+
+            @endforeach
+
+        </select>
+
+    </div>
+
+
+    <div class="col-md-2 d-flex align-items-end">
+
+        <button type="submit" class="btn btn-primary w-100">
+
+            <i class="fa fa-search"></i> Search
+
+        </button>
+
+    </div>
+
+</form>
         </div>
     </div>
 

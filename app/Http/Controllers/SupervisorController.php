@@ -210,64 +210,85 @@ class SupervisorController extends Controller
 
 
     public function adminSyllabusReport(Request $request)
-    {
-        $classId   = $request->input('class_id');   // ID ya Darasa kutoka kwenye filter fomu
-        $subjectId = $request->input('subject_id'); // ID ya Somo kutoka kwenye filter fomu
-        $schoolId  = $request->input('school_id');  // ID ya Shule kutoka kwenye filter fomu
+{
+    $subjectId = $request->input('subject_id');
+    $schoolId  = $request->input('school_id');
 
-        // Kama Admin hajachagua bado vitu hivi, fungua page ikiwa tupu
-        if (!$classId || !$subjectId || !$schoolId) {
-            return view('report2', ['topicsReport' => collect()]);
-        }
-
-        // 1. Chukua Topic zote zilizopo kwenye somo hili kutoka kwenye database
-        $topics = DB::table('topics')
-            ->where('subject_id', $subjectId)
-            ->get();
-
-        $topicsReport = collect();
-
-        foreach ($topics as $topic) {
-            // 2. Hesabu jumla ya sub-topics zilizopo chini ya mada hii kuu
-            $totalSubTopics = DB::table('sub_topics')
-                ->where('topic_id', $topic->id)
-                ->count();
-
-          
-            $completedSubTopics = DB::table('lesson_plans')
-                ->join('subjects', 'lesson_plans.subject_id', '=', 'subjects.id')
-                ->where('lesson_plans.school_id', $schoolId)
-                ->where('subjects.class_room_id', $classId) 
-                ->where('lesson_plans.topic_id', $topic->id)
-                ->where('lesson_plans.status', 'completed')
-                ->distinct('lesson_plans.sub_topic_id') 
-                ->count();
-
-           
-            if ($totalSubTopics > 0 && $completedSubTopics >= $totalSubTopics) {
-                $status = 'Covered';
-                $badgeColor = 'success'; // Kijani
-            } else {
-                $status = 'Uncovered';
-                $badgeColor = 'danger'; // Nyekundu
-            }
-
-           
-            $progress = $totalSubTopics > 0 ? round(($completedSubTopics / $totalSubTopics) * 100, 1) : 0;
-
-            
-            $topicsReport->push([
-                'topic_name'           => $topic->topic_name,
-                'total_sub_topics'     => $totalSubTopics,
-                'completed_sub_topics' => $completedSubTopics,
-                'status'               => $status,
-                'badge_color'          => $badgeColor,
-                'progress'             => $progress
-            ]);
-        }
-
-        return view('report2', compact('topicsReport', 'classId', 'subjectId'));
+    // Kama hajachagua school au subject
+    if (!$subjectId || !$schoolId) {
+        return view('report2', [
+            'topicsReport' => collect()
+        ]);
     }
+
+    // Chukua subject pamoja na class yake
+    $subject = DB::table('subjects')
+        ->where('id', $subjectId)
+        ->first();
+
+    if (!$subject) {
+        return back()->with('error', 'Subject not found.');
+    }
+
+    $classId = $subject->class_room_id;
+
+    // Chukua topic zote za subject
+    $topics = DB::table('topics')
+        ->where('subject_id', $subjectId)
+        ->get();
+
+    $topicsReport = collect();
+
+    foreach ($topics as $topic) {
+
+        // Jumla ya Sub Topics
+        $totalSubTopics = DB::table('sub_topics')
+            ->where('topic_id', $topic->id)
+            ->count();
+
+        // Zilizokamilika
+        $completedSubTopics = DB::table('lesson_plans')
+            ->join('subjects', 'lesson_plans.subject_id', '=', 'subjects.id')
+            ->where('lesson_plans.school_id', $schoolId)
+            ->where('subjects.class_room_id', $classId)
+            ->where('lesson_plans.subject_id', $subjectId)
+            ->where('lesson_plans.topic_id', $topic->id)
+            ->where('lesson_plans.status', 'completed')
+            ->distinct('lesson_plans.sub_topic_id')
+            ->count('lesson_plans.sub_topic_id');
+
+        if ($totalSubTopics > 0 && $completedSubTopics >= $totalSubTopics) {
+
+            $status = 'Covered';
+            $badgeColor = 'success';
+
+        } else {
+
+            $status = 'Uncovered';
+            $badgeColor = 'danger';
+
+        }
+
+        $progress = $totalSubTopics > 0
+            ? round(($completedSubTopics / $totalSubTopics) * 100, 1)
+            : 0;
+
+        $topicsReport->push([
+            'topic_name' => $topic->topic_name,
+            'total_sub_topics' => $totalSubTopics,
+            'completed_sub_topics' => $completedSubTopics,
+            'status' => $status,
+            'badge_color' => $badgeColor,
+            'progress' => $progress
+        ]);
+    }
+
+    return view('report2', compact(
+        'topicsReport',
+        'subjectId',
+        'schoolId'
+    ));
+}
     public function adminSupervisorReports(Request $request)
 {
     $schoolId = $request->input('school_id'); 
